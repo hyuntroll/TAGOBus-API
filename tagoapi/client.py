@@ -1,3 +1,4 @@
+from .exceptions import *
 import requests
 
 
@@ -16,4 +17,7 @@ class TAGOClient:
 
         response = requests.get(f"{self.BASE_URL}/{endpoint}", params=params)
         response.raise_for_status()
+    
+
         return response.json()
+        

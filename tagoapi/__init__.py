@@ -2,5 +2,6 @@
 from .modelA import modelA
 from .client import TAGOClient
 from .route import get_city_code
+from .stations import get_station_by_keyword
 
-__all__ = ['modelA', 'TAGOClient', 'get_city_code']
+__all__ = ['modelA', 'TAGOClient', 'get_city_code', 'get_station_by_keyword']
