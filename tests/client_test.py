@@ -15,4 +15,4 @@ def test_client():
     assert isinstance(res2, dict)
     # print(get_city_code(client))
 
-test_client()
+# test_client()
