@@ -48,7 +48,7 @@ class TAGOClient:
     def get_stations_by_route(
             self,
             cityCode: int,
-            routeId: int,
+            routeId: str,
             numOfRows: int = 10, 
             pageNo: int = 1
         ) -> dict:
@@ -68,7 +68,7 @@ class TAGOClient:
     def get_route_info(
             self,
             cityCode: int,
-            routeId: int,
+            routeId: str,
         ) -> dict:
             
             endpoint = 'BusRouteInfoInqireService/getRouteInfoIem'
@@ -81,18 +81,45 @@ class TAGOClient:
             res = self.get(endpoint=endpoint, params=params)
             return res
     
-    def get_route_info(
+    def get_station_arrivals(
             self,
             cityCode: int,
-            routeId: int,
+            nodeId: str,
+            numOfRows: int = 10, 
+            pageNo: int = 1
         ) -> dict:
-            
-            endpoint = 'BusRouteInfoInqireService/getRouteInfoIem'
+        
+            endpoint = 'ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList'
             params = {
                     "cityCode": cityCode,
-                    "routeId": routeId,
+                    "nodeId": nodeId,
+                    "numOfRows": numOfRows,
+                    "pageNo": pageNo,
                     "_type": 'json'
                 }
 
             res = self.get(endpoint=endpoint, params=params)
             return res
+    
+    def get_station_route_arrival(
+            self,
+            cityCode: int,
+            nodeId: str,
+            routeId: str,
+            numOfRows: int = 10, 
+            pageNo: int = 1
+        ) -> dict:
+        
+            endpoint = 'ArvlInfoInqireService/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
+            params = {
+                    "cityCode": cityCode,
+                    "nodeId": nodeId,
+                    "routeId": routeId,
+                    "numOfRows": numOfRows,
+                    "pageNo": pageNo,
+                    "_type": 'json'
+                }
+
+            res = self.get(endpoint=endpoint, params=params)
+            return res
+    

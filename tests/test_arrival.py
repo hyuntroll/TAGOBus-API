@@ -8,33 +8,27 @@ api_key = os.getenv('TAGO_API_KEY')
 auth = TAGOAuth(api_key)
 client = TAGOClient(auth)
 
-def get_route_list():
+def get_station_arrivals():
     global auth, client
-    res = client.get_route_list(22, 6)
+    res = client.get_station_arrivals(cityCode=22, nodeId='DGB7021050800')
     return res
-def get_stations_by_route():
+def get_station_route_arrival():
     global auth, client
-    res = client.get_stations_by_route(cityCode=22, routeId='DGB3000653000')
-    return res
-def get_route_info():
-    global auth,client
-    res = client.get_route_info(cityCode=22, routeId='DGB3000653000')
+    res = client.get_station_route_arrival(cityCode=22, nodeId='DGB7021050800', routeId='DGB3000653000')
     return res
 
-def test_get_route_list():
+def test_get_station_route_arrivals():
     assert(
-        get_route_list(), dict
+        get_station_arrivals(), dict
     )
-def test_get_stations_by_route():
+def test_get_station_route_arrival():
     assert(
-        get_stations_by_route(), dict
+        get_station_route_arrival(), dict
     )
-def test_get_route_info():
-    assert(
-        get_route_info(), dict
-    )
+
+
+
 
 if __name__ == "__main__":
-    # pprint(get_route_list())
-    # pprint(get_stations_by_route())
-    pprint(get_route_info())
+    pprint(get_station_arrivals())
+    pprint(get_station_route_arrival())
