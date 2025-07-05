@@ -11,7 +11,7 @@ class TAGOClient:
         summery
         """
         if not isinstance(auth, TAGOAuth):
-            raise TypeError("Expected 'client' to be an instance of TAGOClient ")
+            raise TypeError("Expected 'auth' to be an instance of TAGOAuth ")
         
         self.auth = auth
 
@@ -38,8 +38,7 @@ class TAGOClient:
                       "cityCode": cityCode,
                       "routeNo": routeNo,
                       "numOfRows": numOfRows,
-                      "pageNo": pageNo,
-                      "_type": 'json'
+                      "pageNo": pageNo
                  }
 
             res = self.get(endpoint=endpoint, params=params)
@@ -187,3 +186,12 @@ class TAGOClient:
             res = self.get(endpoint=endpoint, params=params)
             return res
     
+    def get_city_code(self) -> dict:
+
+        endpoint = 'BusSttnInfoInqireService/getCtyCodeList'
+        params = {
+                "_type": 'json'
+            }
+
+        res = self.get(endpoint=endpoint, params=params)
+        return res
