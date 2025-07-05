@@ -5,15 +5,14 @@ from pprint import pprint
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
-auth = TAGOAuth(api_key)
-client = TAGOClient(auth)
+client = BusRoute( auth=TAGOAuth(api_key) )
 
 def get_route_list():
-    global auth, client
+    global client
     res = client.get_route_list(22, 6)
     return res
 def get_stations_by_route():
-    global auth, client
+    global client
     res = client.get_stations_by_route(cityCode=22, routeId='DGB3000653000')
     return res
 def get_route_info():
