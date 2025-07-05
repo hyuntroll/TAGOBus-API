@@ -27,8 +27,6 @@ def test_get_station_route_arrival():
     )
 
 
-
-
 if __name__ == "__main__":
     pprint(get_station_arrivals())
     pprint(get_station_route_arrival())

@@ -15,7 +15,6 @@ class TAGOClient:
         
         self.auth = auth
 
-
     def get(self, endpoint: str, params: dict) -> dict:
         params = self.auth.apply(params)
 
@@ -25,6 +24,7 @@ class TAGOClient:
 
         return response.json()
     
+
     def get_route_list(
             self, 
             cityCode: int,
@@ -115,6 +115,70 @@ class TAGOClient:
                     "cityCode": cityCode,
                     "nodeId": nodeId,
                     "routeId": routeId,
+                    "numOfRows": numOfRows,
+                    "pageNo": pageNo,
+                    "_type": 'json'
+                }
+
+            res = self.get(endpoint=endpoint, params=params)
+            return res
+    
+    def get_station_info_by_name(
+            self,
+            cityCode: int,
+            nodeNm: str = '',
+            nodeNo: str = '',
+            numOfRows: int = 10, 
+            pageNo: int = 1
+        ) -> dict:
+        
+            endpoint = 'BusSttnInfoInqireService/getSttnNoList'
+            params = {
+                    "cityCode": cityCode,
+                    "nodeNm": nodeNm,
+                    "nodeNo": nodeNo,
+                    "numOfRows": numOfRows,
+                    "pageNo": pageNo,
+                    "_type": 'json'
+                }
+
+            res = self.get(endpoint=endpoint, params=params)
+            return res
+    
+    def get_station_info_by_gps(
+            self,
+            cityCode: int,
+            gpsLati: int,
+            gpsLong: int,
+            numOfRows: int = 10, 
+            pageNo: int = 1
+        ) -> dict:
+        
+            endpoint = 'BusSttnInfoInqireService/getCrdntPrxmtSttnList'
+            params = {
+                    "cityCode": cityCode,
+                    "gpsLati": gpsLati,
+                    "gpsLong": gpsLong,
+                    "numOfRows": numOfRows,
+                    "pageNo": pageNo,
+                    "_type": 'json'
+                }
+
+            res = self.get(endpoint=endpoint, params=params)
+            return res
+    
+    def get_routes_by_stations(
+            self,
+            cityCode: int,
+            nodeId: str,
+            numOfRows: int = 10, 
+            pageNo: int = 1
+        ) -> dict:
+        
+            endpoint = 'BusSttnInfoInqireService/getSttnThrghRouteList'
+            params = {
+                    "cityCode": cityCode,
+                    "nodeid": nodeId,
                     "numOfRows": numOfRows,
                     "pageNo": pageNo,
                     "_type": 'json'
