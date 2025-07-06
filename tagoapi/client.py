@@ -7,11 +7,12 @@ class TAGOClient:
     BASE_URL = "http://apis.data.go.kr/1613000"
 
     def __init__(self, auth: TAGOAuth):
-
         if not isinstance(auth, TAGOAuth):
             raise TypeError("Expected 'auth' to be an instance of TAGOAuth")
         
         self.auth = auth
+
+        self._cache = Cache()
 
     def get(self, endpoint: str, params: dict) -> dict:
         
@@ -30,3 +31,4 @@ class TAGOClient:
 
         res = self.get(endpoint=endpoint, params=params)
         return res
+    
