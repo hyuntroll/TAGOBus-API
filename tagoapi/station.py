@@ -2,21 +2,21 @@ from .client import TAGOClient
 from .auth import TAGOAuth
 from .utils import *
 
-
 class BusStation(TAGOClient):
     SERVICE_URL = "BusSttnInfoInqireService"
     
     def __init__(self, auth: TAGOAuth):
         super().__init__(auth) 
     
+    @from_cache_or_fetch
     def get_station_info_by_name(
         self,
         cityCode: int,
         nodeNm: str = '',
-        nodeNo: str = '',
-        endpoint: str = f'{SERVICE_URL}/getSttnNoList'
+        nodeNo: str = ''
     ) -> dict:
         
+        endpoint = f'{self.SERVICE_URL}/getSttnNoList'
         params = {
                 "cityCode": cityCode,
                 "nodeNm": nodeNm,
@@ -28,14 +28,15 @@ class BusStation(TAGOClient):
         res = self.get(endpoint=endpoint, params=params)
         return res
     
+    @from_cache_or_fetch
     def get_station_info_by_gps(
         self,
         cityCode: int,
         gpsLati: int,
-        gpsLong: int,
-        endpoint: int = f'{SERVICE_URL}/getCrdntPrxmtSttnList'
+        gpsLong: int
     ) -> dict:
         
+        endpoint = f'{self.SERVICE_URL}/getCrdntPrxmtSttnList'
         params = prepare_params(
             self.auth,
             {
@@ -48,13 +49,14 @@ class BusStation(TAGOClient):
         res = self.get(endpoint=endpoint, params=params)
         return res
     
+    @from_cache_or_fetch
     def get_routes_by_stations(
         self,
         cityCode: int,
-        nodeId: str,
-        endpoint: str = f'{SERVICE_URL}/getSttnThrghRouteList'
+        nodeId: str
     ) -> dict:
         
+        endpoint = f'{self.SERVICE_URL}/getSttnThrghRouteList'
         params = prepare_params(
             self.auth,
             {

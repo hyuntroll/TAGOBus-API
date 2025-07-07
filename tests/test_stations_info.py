@@ -5,7 +5,7 @@ from pprint import pprint
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
-client = TAGOClient(serviceKey=api_key)
+client = TAGOClient(auth=TAGOAuth(api_key))
 
 
 def get_station_info_by_name():

@@ -34,6 +34,6 @@ def test_get_route_info():
     )
 
 if __name__ == "__main__":
-    # pprint(get_route_list())
+    pprint(get_route_list())
     # pprint(get_stations_by_route())
     pprint(get_route_info())

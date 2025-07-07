@@ -12,28 +12,18 @@ api_key = os.getenv('TAGO_API_KEY')
 # )
 
 
-
 ## test decorater
-@from_cache_or_fetch("www.example.com")
-def test(citycode: int, nodeId: int, endpoint):
-    
-    print(citycode, nodeId, endpoint)
-    return "뮤텍스락"
-# print(test(citycode=2, nodeId=3456))
-
-
-class universe:
+class Universe:
     def __init__(self):
         pass
 
-    @from_cache_or_fetch("www.example.com")
-    def testMethod(self, citycode: int, nodeId: int, endpoint):
-        print(citycode, nodeId, endpoint)
-        return "세마포"
+    @from_cache_or_fetch(2345)
+    def testMethod(self, citycode: int, nodeId: int):
+        print("method", citycode, nodeId)
+        return "세마포어"
 
-test1 = universe()
+test1 = Universe()
 print(test1.testMethod(citycode=12, nodeId=12))
-
 
 
 

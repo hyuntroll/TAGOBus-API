@@ -9,13 +9,14 @@ class BusRoute(TAGOClient):
     def __init__(self, auth: TAGOAuth):
         super().__init__(auth) 
 
-    @from_cache_or_fetch(f'{SERVICE_URL}/getRouteNoList', 604800)
+    @from_cache_or_fetch(604800)
     def get_route_list(
         self,
         cityCode: int,
-        routeNo: int,
-        endpoint: str
+        routeNo: int
     ) -> dict:
+        endpoint = f'{self.SERVICE_URL}/getRouteNoList'
+        
         params = prepare_params(
             self.auth,
             {
@@ -28,13 +29,13 @@ class BusRoute(TAGOClient):
         return res
     
 
-    @from_cache_or_fetch(f'{SERVICE_URL}/getRouteAcctoThrghSttnList', 604800)
+    @from_cache_or_fetch(604800)
     def get_stations_by_route(
         self,
         cityCode: int,
-        routeId: str,
-        endpoint: str
+        routeId: str
     ) -> dict:
+        endpoint = f'{self.SERVICE_URL}/getRouteAcctoThrghSttnList'
         params = prepare_params(
             self.auth,
             {
@@ -47,13 +48,13 @@ class BusRoute(TAGOClient):
         return res
     
 
-    @from_cache_or_fetch(f'{SERVICE_URL}/getRouteInfoIem', 604800)
+    @from_cache_or_fetch(604800)
     def get_route_info(
         self,
         cityCode: int,
-        routeId: str,
-        endpoint: str
+        routeId: str
     ) -> dict:
+        endpoint = f'{self.SERVICE_URL}/getRouteInfoIem'
         params = prepare_params(
             self.auth,
             {

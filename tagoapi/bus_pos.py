@@ -1,6 +1,6 @@
 from .client import TAGOClient
 from .auth import TAGOAuth
-from .utils import prepare_params
+from .utils import *
 
 
 class BusPosition(TAGOClient):

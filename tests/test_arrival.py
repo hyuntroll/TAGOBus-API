@@ -5,7 +5,7 @@ from pprint import pprint
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
-client = BusArrival( auth=BusArrival(api_key) )
+client = BusArrival( auth=TAGOAuth(api_key) )
 
 
 def get_station_arrivals():
