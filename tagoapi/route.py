@@ -1,6 +1,6 @@
 from .client import TAGOClient
 from .auth import TAGOAuth
-from .utils import prepare_params
+from .utils import *
 
 
 class BusRoute(TAGOClient):
@@ -13,9 +13,14 @@ class BusRoute(TAGOClient):
         self, 
         cityCode: int,
         routeNo: int,
-    ) -> dict:
-            
+    ) -> dict:            
         endpoint = f'{self.SERVICE_URL}/getRouteNoList'
+        key = f'{endpoint}={cityCode}&routeNo={routeNo}'
+
+        cached = cache.get(key)
+        if cached:
+            return cached
+
         params = prepare_params(
             self.auth,
             {
@@ -25,6 +30,7 @@ class BusRoute(TAGOClient):
         ) 
 
         res = self.get(endpoint=endpoint, params=params)
+        cache.save(key, res, ttl=604800)
         return res
     
     def get_stations_by_route(
@@ -34,6 +40,10 @@ class BusRoute(TAGOClient):
     ) -> dict:
         
         endpoint = f'{self.SERVICE_URL}/getRouteAcctoThrghSttnList'
+        key = f'{endpoint}={cityCode}&routeId={routeId}'
+        cached = cache.get(key)
+        if cached:
+            return cached
         params = prepare_params(
             self.auth,
             {
@@ -43,6 +53,7 @@ class BusRoute(TAGOClient):
         ) 
 
         res = self.get(endpoint=endpoint, params=params)
+        cache.save(key, res, ttl=604800)
         return res
     
     def get_route_info(
@@ -52,6 +63,10 @@ class BusRoute(TAGOClient):
     ) -> dict:
             
         endpoint = f'{self.SERVICE_URL}/getRouteInfoIem'
+        key = f'{endpoint}={cityCode}&routeId={routeId}'
+        cached = cache.get(key)
+        if cached:
+            return cached
         params = prepare_params(
             self.auth,
             {
@@ -61,5 +76,6 @@ class BusRoute(TAGOClient):
         )
         
         res = self.get(endpoint=endpoint, params=params)
+        cache.save(key, res, ttl=604800)
         return res
     
