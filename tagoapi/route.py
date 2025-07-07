@@ -9,41 +9,32 @@ class BusRoute(TAGOClient):
     def __init__(self, auth: TAGOAuth):
         super().__init__(auth) 
 
+    @from_cache_or_fetch(f'{SERVICE_URL}/getRouteNoList', 604800)
     def get_route_list(
-        self, 
+        self,
         cityCode: int,
         routeNo: int,
-    ) -> dict:            
-        endpoint = f'{self.SERVICE_URL}/getRouteNoList'
-        key = f'{endpoint}={cityCode}&routeNo={routeNo}'
-
-        cached = cache.get(key)
-        if cached:
-            return cached
-
+        endpoint: str
+    ) -> dict:
         params = prepare_params(
             self.auth,
             {
                 "cityCode": cityCode,
-                "routeNo": routeNo,
+                "routeNo": routeNo
             }
-        ) 
+        )
+        res = self.get(endpoint, params=params)
 
-        res = self.get(endpoint=endpoint, params=params)
-        cache.save(key, res, ttl=604800)
         return res
     
+
+    @from_cache_or_fetch(f'{SERVICE_URL}/getRouteAcctoThrghSttnList', 604800)
     def get_stations_by_route(
         self,
         cityCode: int,
         routeId: str,
+        endpoint: str
     ) -> dict:
-        
-        endpoint = f'{self.SERVICE_URL}/getRouteAcctoThrghSttnList'
-        key = f'{endpoint}={cityCode}&routeId={routeId}'
-        cached = cache.get(key)
-        if cached:
-            return cached
         params = prepare_params(
             self.auth,
             {
@@ -51,22 +42,18 @@ class BusRoute(TAGOClient):
                 "routeId": routeId
             }
         ) 
-
         res = self.get(endpoint=endpoint, params=params)
-        cache.save(key, res, ttl=604800)
+
         return res
     
+
+    @from_cache_or_fetch(f'{SERVICE_URL}/getRouteInfoIem', 604800)
     def get_route_info(
         self,
         cityCode: int,
         routeId: str,
+        endpoint: str
     ) -> dict:
-            
-        endpoint = f'{self.SERVICE_URL}/getRouteInfoIem'
-        key = f'{endpoint}={cityCode}&routeId={routeId}'
-        cached = cache.get(key)
-        if cached:
-            return cached
         params = prepare_params(
             self.auth,
             {
@@ -76,6 +63,5 @@ class BusRoute(TAGOClient):
         )
         
         res = self.get(endpoint=endpoint, params=params)
-        cache.save(key, res, ttl=604800)
         return res
     

@@ -1,6 +1,6 @@
 from .client import TAGOClient
 from .auth import TAGOAuth
-from .utils import prepare_params
+from .utils import *
 
 
 class BusStation(TAGOClient):
@@ -14,20 +14,17 @@ class BusStation(TAGOClient):
         cityCode: int,
         nodeNm: str = '',
         nodeNo: str = '',
-        numOfRows: int = 10, 
-        pageNo: int = 1
+        endpoint: str = f'{SERVICE_URL}/getSttnNoList'
     ) -> dict:
         
-        endpoint = f'{self.SERVICE_URL}/getSttnNoList'
-        params = prepare_params (
-            self.auth,
-            {
+        params = {
                 "cityCode": cityCode,
                 "nodeNm": nodeNm,
                 "nodeNo": nodeNo,
             }
-        )
+        
 
+        params = prepare_params(self.auth, params)
         res = self.get(endpoint=endpoint, params=params)
         return res
     
@@ -36,9 +33,9 @@ class BusStation(TAGOClient):
         cityCode: int,
         gpsLati: int,
         gpsLong: int,
+        endpoint: int = f'{SERVICE_URL}/getCrdntPrxmtSttnList'
     ) -> dict:
         
-        endpoint = f'{self.SERVICE_URL}/getCrdntPrxmtSttnList'
         params = prepare_params(
             self.auth,
             {
@@ -55,11 +52,9 @@ class BusStation(TAGOClient):
         self,
         cityCode: int,
         nodeId: str,
-        numOfRows: int = 10, 
-        pageNo: int = 1
+        endpoint: str = f'{SERVICE_URL}/getSttnThrghRouteList'
     ) -> dict:
         
-        endpoint = f'{self.SERVICE_URL}/getSttnThrghRouteList'
         params = prepare_params(
             self.auth,
             {

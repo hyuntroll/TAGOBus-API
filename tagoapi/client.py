@@ -21,14 +21,19 @@ class TAGOClient:
     
 
         return response.json()
-
-    # def get_city_code(self) -> dict:
-
-        endpoint = 'BusSttnInfoInqireService/getCtyCodeList'
-        params = {
-                "_type": 'json'
-        }
-
-        res = self.get(endpoint=endpoint, params=params)
-        return res
     
+    # def _from_cache_with_params(
+    #     self, 
+    #     endpoint: str, 
+    #     params: dict, 
+    #     ttl:int = 86400
+    # ) -> dict:
+        
+    #     key = endpoint + "?" + "&".join(
+    #         f"{key}={value}" for key, value in params.items()
+    #     )
+    #     cached = cache.get(key)
+    #     if cached:
+    #         return cached
+    #     else:
+    #         return False
