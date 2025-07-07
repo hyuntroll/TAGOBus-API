@@ -92,7 +92,7 @@ def prepare_params(
         }
 
 
-@from_cache_or_fetch("15552000")
+
 def get_city_code(serviceKey) -> dict:
     # 요청 후에 캐시로 저장하는 코드
     key = "BusSttnInfoInqireService/getCtyCodeList"

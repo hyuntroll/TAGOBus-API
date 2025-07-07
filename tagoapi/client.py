@@ -12,7 +12,7 @@ class TAGOClient:
         
         self.auth = auth
 
-        self._cache = Cache()
+        # self._cache = Cache()
 
     def get(self, endpoint: str, params: dict) -> dict:
         

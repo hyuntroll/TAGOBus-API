@@ -9,7 +9,7 @@ client = BusRoute( auth=TAGOAuth(api_key) )
 
 def get_route_list():
     global client
-    res = client.get_route_list(22, 6)
+    res = client.get_route_list(22, "북구1")
     return res
 def get_stations_by_route():
     global client
@@ -36,4 +36,4 @@ def test_get_route_info():
 if __name__ == "__main__":
     pprint(get_route_list())
     # pprint(get_stations_by_route())
-    pprint(get_route_info())
+    # pprint(get_route_info())

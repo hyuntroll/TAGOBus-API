@@ -5,7 +5,7 @@ from pprint import pprint
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
-client = TAGOClient(auth=TAGOAuth(api_key))
+client = BusStation(auth=TAGOAuth(api_key))
 
 
 def get_station_info_by_name():
@@ -19,10 +19,6 @@ def get_station_info_by_gps():
 def get_routes_by_stations():
     global client
     res = client.get_routes_by_stations(cityCode=22, nodeId='DGB7021050800')
-    return res
-def get_city_code():
-    global client
-    res = client.get_city_code()
     return res
 
 
@@ -38,13 +34,9 @@ def test_get_routes_by_stations():
     assert(
         get_routes_by_stations(), dict
     )
-def test_get_city_code():
-    assert(
-        get_city_code(), dict
-    )
 
 if __name__ == "__main__":
-    # pprint(get_station_info_by_name())
-    # pprint(get_station_info_by_gps())
-    # pprint(get_routes_by_stations())
-    pprint(get_city_code())
+    pprint(get_station_info_by_name())
+    pprint(get_station_info_by_gps())
+    pprint(get_routes_by_stations())
+    # pprint(get_city_code())
