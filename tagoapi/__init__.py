@@ -5,5 +5,6 @@ from .route import BusRoute
 from .bus_arrival import BusArrival
 from .station import BusStation
 from .bus_pos import BusPosition
+from .utils import get_city_code
 
-__all__ = [ 'TAGOClient', 'TAGOAuth', 'BusRoute', 'BusArrival', 'BusStation', 'BusPosition' ]
+__all__ = [ 'TAGOClient', 'TAGOAuth', 'BusRoute', 'BusArrival', 'BusStation', 'BusPosition', 'get_city_code' ]

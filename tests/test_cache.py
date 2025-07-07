@@ -1,22 +1,39 @@
-from tagoapi import TAGOAuth, TAGOClient
+from tagoapi import *
 import pickle
+from pprint import pprint
+from dotenv import load_dotenv
+import os
 
 
+load_dotenv()
+api_key = os.getenv('TAGO_API_KEY')
+
+
+pprint(
+    get_city_code(api_key)
+)
+
+
+
+
+"""
 data = {}
 data[1] = {'no': 1, 'subject': '안2345녕 피클1', 'content': '피클은 매우 간단합니다.'}
 
-# with open('data.p', 'wb') as f:
-#     pickle.dump(data, f)
+with open('data.p', 'wb') as f:
+    pickle.dump(data, f)
 
 
-# with open('data.p', 'rb') as f:
-#     print(pickle.load(f))
+with open('data.p', 'rb') as f:
+    print(pickle.load(f))
 
-# print(hash('adfk'))
+print(hash('adfk'))
 
 
 client = TAGOClient(auth=TAGOAuth("3456"))
 
-# client._cache_save()
+client._cache_save()
 
 print(client._cache_get())
+"""
+

@@ -22,12 +22,12 @@ class TAGOClient:
 
         return response.json()
 
-    def get_city_code(self) -> dict:
+    # def get_city_code(self) -> dict:
 
         endpoint = 'BusSttnInfoInqireService/getCtyCodeList'
         params = {
                 "_type": 'json'
-            }
+        }
 
         res = self.get(endpoint=endpoint, params=params)
         return res
