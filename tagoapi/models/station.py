@@ -20,7 +20,7 @@ class Station:
         # self.routeList = routeList
 
     def __repr__(self):
-        return f"<Station {self.nodeNm}>"
+        return f"<Station: {self.nodeNm}>"
     
     def to_dict(self):
         return vars(self)
@@ -35,4 +35,8 @@ class Station:
             gpsLong = float(data.get("gpslong")),
 
         )
+    
+    @classmethod
+    def from_list(cls, data: list[dict]) -> list["Station"]:
+        return [cls.from_dict(station) for station in data]
     

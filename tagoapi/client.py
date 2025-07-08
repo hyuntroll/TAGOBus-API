@@ -17,10 +17,12 @@ class TAGOClient:
         
         response = requests.get(f"{self.BASE_URL}/{endpoint}", params=params)
         response.raise_for_status()
-    
+        striped_data = strip_meta(response.json())
 
-        return response.json()
-    
+        return striped_data
+
+
+
     # def _from_cache_with_params(
     #     self, 
     #     endpoint: str, 

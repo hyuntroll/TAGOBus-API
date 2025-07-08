@@ -23,19 +23,12 @@ class BusRoute(TAGOClient):
                 "routeNo": routeNo
             }
         )
+
         res = self.get(endpoint, params=params)
-
-        data_lst = res["response"]["body"]["items"]["item"]
-        if isinstance(data_lst, dict):
-            data_lst = [data_lst]
-
-        route_lst = [] 
-        for data in data_lst: # 이거 값이 하나일 때랑 여러개일 때 파일이 다름 하나일 땐 dict, list[dict] 이렇게 되서 이거 고치면 될듯
-            # print(data)
-            route = Route.from_dict(data)
-            route_lst.append(route)
-
-        return route_lst
+        if res["totalCount"] == 0:
+            return []
+        route_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
+        return Route.from_list(route_list)
     
     @from_cache_or_fetch(604800)
     def get_stations_by_route(
@@ -50,19 +43,13 @@ class BusRoute(TAGOClient):
                 "cityCode": cityCode,
                 "routeId": routeId
             }
-        ) 
+        )
         res = self.get(endpoint=endpoint, params=params)
-
-        data_lst = res["response"]["body"]["items"]["item"]
-        station_lst = [] 
-        for data in data_lst: # 이거 값이 하나일 때랑 여러개일 때 파일이 다름 하나일 땐 dict, list[dict] 이렇게 되서 이거 고치면 될듯
-            print(data)
-            route = Station.from_dict(data)
-            station_lst.append(route)
-
-        return station_lst
+        if res["totalCount"] == 0:
+            return []
+        station_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
+        return Station.from_list(station_list)
     
-
     @from_cache_or_fetch(604800)
     def get_route_info(
         self,
@@ -78,9 +65,9 @@ class BusRoute(TAGOClient):
             }
         )
         res = self.get(endpoint=endpoint, params=params)
-
-        data = res["response"]["body"]["items"]["item"]
-        route = Route.from_dict(data)
+        if not res["items"]["item"]:
+            return None
+        route = Route.from_dict(res["items"]["item"])
 
         return route
 

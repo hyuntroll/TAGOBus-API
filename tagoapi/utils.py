@@ -26,7 +26,7 @@ def from_cache_or_fetch(ttl: int = 86400): # 데코레이터가 사용할 매개
     return real_deco
 
 def generate_cache_key(*args, _fname: str, **kwargs) -> str:
-    return _fname + ":" + "&".join([a for a in args]) + "&".join(
+    return _fname + ":" + "&".join([str(a) for a in args]) + "&".join(
         f"{key}={value}" for key, value in kwargs.items()
     ) ## str로 나타낼 수 없으면 다르게 표시하도록
 
@@ -34,6 +34,10 @@ def generate_cache_key(*args, _fname: str, **kwargs) -> str:
     # return endpoint + "?" + "&".join(
     #             f"{key}={value}" for key, value in kwargs.items()
     #         )
+
+def strip_meta(res: dict) -> dict:
+    striped = res.get("response", {}).get("body", {})
+    return striped
 
 def prepare_params(
         auth: TAGOAuth, 
@@ -49,6 +53,9 @@ def prepare_params(
         "pageNo": pageNo,
         "_type": "json"
         }
+
+
+
 
 
 

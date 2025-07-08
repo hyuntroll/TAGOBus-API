@@ -7,11 +7,11 @@ class Route:
     def __init__(
         self,
         routeId: str,
-        routeNo: str | None,
-        routeTp: str | None,
+        routeNo: str = None,
+        routeTp: str = None,
         endNode: "Station" = None,
         startNode: "Station" = None,
-        endvehicletime: "int" = None,
+        endvehicletime: int = None,
         startvehicletime: int = None,
         #TODO: 정류장 리스트도 넣으면 좋을 듯 합니당
     ):
@@ -25,7 +25,7 @@ class Route:
         self.startvehicletime = startvehicletime
 
     def __repr__(self):
-        return f"<Route {self.routeNo}>"
+        return f"<Route: {self.routeNo}>"
     
     def to_dict(self):
         return vars(self)
@@ -36,6 +36,10 @@ class Route:
             routeId=data["routeid"],
             routeNo=data["routeno"],
             routeTp=data["routetp"],
-            endvehicletime=int(data.get("endvehicletime")),
-            startvehicletime=int(data.get("startvehicletime"))
+            endvehicletime=data.get("endvehicletime"),
+            startvehicletime=data.get("startvehicletime")
         )
+    
+    @classmethod
+    def from_list(cls, data: list[dict]) -> list["Route"]:
+        return [ cls.from_dict(route) for route in data ]
