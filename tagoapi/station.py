@@ -1,5 +1,6 @@
 from .client import TAGOClient
 from .utils import *
+from .models import *
 
 class BusStation(TAGOClient):
     SERVICE_URL = "BusSttnInfoInqireService"
@@ -13,8 +14,7 @@ class BusStation(TAGOClient):
         cityCode: int,
         nodeNm: str = '',
         nodeNo: str = ''
-    ) -> dict:
-        
+    ) -> list[Station]:
         endpoint = f'{self.SERVICE_URL}/getSttnNoList'
         params = prepare_params(
             self.auth,
@@ -24,9 +24,12 @@ class BusStation(TAGOClient):
                 "nodeNo": nodeNo,
             }
         )
-        
         res = self.get(endpoint=endpoint, params=params)
-        return res
+        if res["totalCount"] == 0:
+            return []
+        
+        station_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
+        return Station.from_list(station_list)
     
     @from_cache_or_fetch()
     def get_station_info_by_gps(
@@ -34,8 +37,7 @@ class BusStation(TAGOClient):
         cityCode: int,
         gpsLati: int,
         gpsLong: int
-    ) -> dict:
-        
+    ) -> list[Station]:
         endpoint = f'{self.SERVICE_URL}/getCrdntPrxmtSttnList'
         params = prepare_params(
             self.auth,
@@ -45,16 +47,20 @@ class BusStation(TAGOClient):
                 "gpsLong": gpsLong,
             }
         )
-
         res = self.get(endpoint=endpoint, params=params)
-        return res
+
+        if res["totalCount"] == 0:
+            return []
+        
+        station_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
+        return Station.from_list(station_list)
     
     @from_cache_or_fetch()
     def get_routes_by_stations(
         self,
         cityCode: int,
         nodeId: str
-    ) -> dict:
+    ) -> list[Route]:
         
         endpoint = f'{self.SERVICE_URL}/getSttnThrghRouteList'
         params = prepare_params(
@@ -66,5 +72,8 @@ class BusStation(TAGOClient):
         )
 
         res = self.get(endpoint=endpoint, params=params)
-        return res
+        if res["totalCount"] == 0:
+            return []
+        route_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
+        return Route.from_list(route_list)
     
