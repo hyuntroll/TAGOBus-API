@@ -5,7 +5,7 @@ from pprint import pprint
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
-client = BusRoute(auth=TAGOAuth(api_key))
+client = TAGOClient(auth=TAGOAuth(api_key))
 
 def get_route_list():
     global client
