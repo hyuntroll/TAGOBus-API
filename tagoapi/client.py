@@ -1,4 +1,3 @@
-from .auth import TAGOAuth
 from .exceptions import *
 from .utils import *
 

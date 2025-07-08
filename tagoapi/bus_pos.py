@@ -1,5 +1,4 @@
 from .client import TAGOClient
-from .auth import TAGOAuth
 from .utils import *
 
 

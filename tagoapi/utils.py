@@ -2,6 +2,7 @@ from .auth import TAGOAuth
 import requests
 import os, pickle
 from time import time
+from .models import *
 
 CACHE_PATH = 'caches/cache.pkl'
 class Cache:

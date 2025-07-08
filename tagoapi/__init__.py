@@ -7,5 +7,7 @@ from .station import BusStation
 from .bus_pos import BusPosition
 from .utils import get_city_code
 from .utils import from_cache_or_fetch
+from .models import Route
+from .models import Vehicle
 
-__all__ = [ 'TAGOClient', 'TAGOAuth', 'BusRoute', 'BusArrival', 'BusStation', 'BusPosition', 'get_city_code', 'from_cache_or_fetch' ]
+__all__ = [ 'TAGOClient', 'TAGOAuth', 'BusRoute', 'BusArrival', 'BusStation', 'BusPosition', 'get_city_code', 'from_cache_or_fetch', 'Route', 'Vehicle' ]

@@ -1,5 +1,4 @@
 from .client import TAGOClient
-from .auth import TAGOAuth
 from .utils import *
 
 class BusStation(TAGOClient):
@@ -8,7 +7,7 @@ class BusStation(TAGOClient):
     def __init__(self, auth: TAGOAuth):
         super().__init__(auth) 
     
-    @from_cache_or_fetch
+    @from_cache_or_fetch(86400)
     def get_station_info_by_name(
         self,
         cityCode: int,
@@ -17,18 +16,19 @@ class BusStation(TAGOClient):
     ) -> dict:
         
         endpoint = f'{self.SERVICE_URL}/getSttnNoList'
-        params = {
+        params = prepare_params(
+            self.auth,
+            {
                 "cityCode": cityCode,
                 "nodeNm": nodeNm,
                 "nodeNo": nodeNo,
             }
+        )
         
-
-        params = prepare_params(self.auth, params)
         res = self.get(endpoint=endpoint, params=params)
         return res
     
-    @from_cache_or_fetch
+    @from_cache_or_fetch()
     def get_station_info_by_gps(
         self,
         cityCode: int,
@@ -49,7 +49,7 @@ class BusStation(TAGOClient):
         res = self.get(endpoint=endpoint, params=params)
         return res
     
-    @from_cache_or_fetch
+    @from_cache_or_fetch()
     def get_routes_by_stations(
         self,
         cityCode: int,
