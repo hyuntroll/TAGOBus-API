@@ -1,58 +1,17 @@
 from .auth import TAGOAuth
-import requests
-import os, pickle
-from time import time
 from .models import *
+from .cache import Cache
+import requests
+import os
+from time import time
 
-CACHE_PATH = 'caches/cache.pkl'
-class Cache:
-    def __init__(self, path: str = CACHE_PATH):
-        os.makedirs("caches", exist_ok=True)
-        self.path = path
-        self._cache = self._load()
-
-
-    def _load(self) -> dict:
-        if os.path.exists(self.path):
-            with open(self.path, 'rb') as f:
-                return pickle.load(f)
-        else:
-            return {}
-
-    def save(self, key: str, value: dict, ttl: int = 86400)  -> bool:
-        os.makedirs("caches", exist_ok=True)
-      
-        self._cache[key] = {
-            "value": value, 
-            "ttl": ttl,
-            "saved_time": time()
-        }
-        with open(self.path, 'wb') as f:
-            pickle.dump(self._cache, f)
-        
-        return True
-    
-    def get(self, key: str) -> dict | bool:
-        entry = self._cache.get(key)
-        if not entry:
-            return None
-        
-
-        value, saved_time, ttl = entry["value"], entry["saved_time"], entry["ttl"]
-        
-        if time() - saved_time > ttl:
-            del self._cache[key]
-            return None
-        
-        
-        return value
+CACHE_PATH = 'caches/cache.pkl' 
 cache = Cache()
 
 # method에서만 사용할 함수
 def from_cache_or_fetch(ttl: int = 86400): # 데코레이터가 사용할 매개변수
     def real_deco(fn): # 호출할 함수를 매개변수로 받음
         def wrapper(self, *args, **kwargs): # 호출할 함수의 매개변수를 받아서 이를 실행
-            # print(kwargs, endpoint)
             key = generate_cache_key(*args, _fname=fn.__name__, **kwargs)
             cached = cache.get(key)
             if cached:
@@ -67,10 +26,9 @@ def from_cache_or_fetch(ttl: int = 86400): # 데코레이터가 사용할 매개
     return real_deco
 
 def generate_cache_key(*args, _fname: str, **kwargs) -> str:
-    # print(args, _fname, kwargs)
-    return _fname + ":" + "&".join([a for a in args if a == int or a == str]) + "&".join(
-        f"{key}={value}" for key, value in kwargs.items() if value == int or value == str
-    )
+    return _fname + ":" + "&".join([a for a in args]) + "&".join(
+        f"{key}={value}" for key, value in kwargs.items()
+    ) ## str로 나타낼 수 없으면 다르게 표시하도록
 
 
     # return endpoint + "?" + "&".join(

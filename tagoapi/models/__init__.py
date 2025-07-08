@@ -1,5 +1,5 @@
 from .route import Route
 from .vehicle import Vehicle
-from .station import station
+from .station import Station
 
-__all__ = ['Route', 'Vehicle', 'station']
+__all__ = ['Route', 'Vehicle', 'Station']

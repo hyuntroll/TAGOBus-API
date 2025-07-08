@@ -1,4 +1,6 @@
 from .client import TAGOClient
+from .models import Route
+from .models import Station
 from .utils import *
 
 class BusRoute(TAGOClient):
@@ -12,9 +14,8 @@ class BusRoute(TAGOClient):
         self,
         cityCode: int,
         routeNo: int
-    ) -> dict:
+    ) -> list[Route]:
         endpoint = f'{self.SERVICE_URL}/getRouteNoList'
-        
         params = prepare_params(
             self.auth,
             {
@@ -23,22 +24,25 @@ class BusRoute(TAGOClient):
             }
         )
         res = self.get(endpoint, params=params)
-        # print(res["response"]["body"]["items"])
+
+        data_lst = res["response"]["body"]["items"]["item"]
+        if isinstance(data_lst, dict):
+            data_lst = [data_lst]
+
         route_lst = [] 
-        for key, data in res["response"]["body"]["items"].items(): # 이거 값이 하나일 때랑 여러개일 때 파일이 다름 하나일 땐 dict, list[dict] 이렇게 되서 이거 고치면 될듯
-            # print(data, type(data))
-            route = Route(data)
+        for data in data_lst: # 이거 값이 하나일 때랑 여러개일 때 파일이 다름 하나일 땐 dict, list[dict] 이렇게 되서 이거 고치면 될듯
+            # print(data)
+            route = Route.from_dict(data)
             route_lst.append(route)
 
         return route_lst
     
-
     @from_cache_or_fetch(604800)
     def get_stations_by_route(
         self,
         cityCode: int,
         routeId: str
-    ) -> dict:
+    ) -> list[Route]:
         endpoint = f'{self.SERVICE_URL}/getRouteAcctoThrghSttnList'
         params = prepare_params(
             self.auth,
@@ -49,7 +53,14 @@ class BusRoute(TAGOClient):
         ) 
         res = self.get(endpoint=endpoint, params=params)
 
-        return res
+        data_lst = res["response"]["body"]["items"]["item"]
+        station_lst = [] 
+        for data in data_lst: # 이거 값이 하나일 때랑 여러개일 때 파일이 다름 하나일 땐 dict, list[dict] 이렇게 되서 이거 고치면 될듯
+            print(data)
+            route = Station.from_dict(data)
+            station_lst.append(route)
+
+        return station_lst
     
 
     @from_cache_or_fetch(604800)
@@ -57,7 +68,7 @@ class BusRoute(TAGOClient):
         self,
         cityCode: int,
         routeId: str
-    ) -> dict:
+    ) -> Route:
         endpoint = f'{self.SERVICE_URL}/getRouteInfoIem'
         params = prepare_params(
             self.auth,
@@ -66,7 +77,10 @@ class BusRoute(TAGOClient):
                 "routeId": routeId,
             }
         )
-        
         res = self.get(endpoint=endpoint, params=params)
-        return res
+
+        data = res["response"]["body"]["items"]["item"]
+        route = Route.from_dict(data)
+
+        return route
 
