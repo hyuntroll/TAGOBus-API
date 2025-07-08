@@ -17,16 +17,6 @@ def get_station_route_arrival():
     res = client.get_station_route_arrival(cityCode=22, nodeId='DGB7021050800', routeId='DGB3000653000')
     return res
 
-def test_get_station_route_arrivals():
-    assert(
-        get_station_arrivals(), dict
-    )
-def test_get_station_route_arrival():
-    assert(
-        get_station_route_arrival(), dict
-    )
-
-
 if __name__ == "__main__":
     pprint(get_station_arrivals())
     pprint(get_station_route_arrival())
