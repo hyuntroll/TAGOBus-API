@@ -1,6 +1,7 @@
 from .auth import TAGOAuth
 from .models import *
 from .cache import Cache
+from typing import Union
 import requests
 import os
 from time import time
@@ -35,9 +36,13 @@ def generate_cache_key(*args, _fname: str, **kwargs) -> str:
     #             f"{key}={value}" for key, value in kwargs.items()
     #         )
 
-def strip_meta(res: dict) -> dict:
-    striped = res.get("response", {}).get("body", {})
-    return striped
+def parse_metadata(res: dict) -> dict | list:
+    striped = res.get("response", {}).get("body", {}).get("items", {})
+    if isinstance(striped, dict):
+        return striped.get("item", None)
+
+    return None
+
 
 def prepare_params(
         auth: TAGOAuth, 
@@ -53,11 +58,6 @@ def prepare_params(
         "pageNo": pageNo,
         "_type": "json"
         }
-
-
-
-
-
 
 def get_city_code(serviceKey) -> dict:
     # 요청 후에 캐시로 저장하는 코드

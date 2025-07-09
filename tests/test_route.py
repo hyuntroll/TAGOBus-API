@@ -9,7 +9,7 @@ client = TAGOClient(auth=TAGOAuth(api_key))
 
 def get_route_list():
     global client
-    res = client.get_route_list(cityCode=22, routeNo="북구4")
+    res = client._get_route_by_routeNo(cityCode=22, routeNo="북구")
     return res
 def get_stations_by_route():
     global client
@@ -17,19 +17,17 @@ def get_stations_by_route():
     return res
 def get_route_info():
     global client
-    res = client.get_route_info(cityCode=22, routeId='DGB2000002000')
+    res = client._get_route_info(cityCode=22, routeId='')
     return res
 
 
 
 if __name__ == "__main__":
-    pprint(get_route_list())
-    pprint(get_stations_by_route())
-    pprint(get_route_info())
+    # pprint(get_route_list())
+    # pprint(get_stations_by_route())
+    # pprint(get_route_info())
 
-    # lst = get_route_list()
+    # route = client.get_route(22, routeId="DGB3000653000")
 
-
-    # 이제 사용 X
-    # for route in lst:
-    #     print(route.to_dict())
+    # pprint(route)
+    pprint(client.get_route(22, routeNo="북구4"))

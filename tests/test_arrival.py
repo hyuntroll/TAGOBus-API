@@ -14,11 +14,12 @@ def get_station_arrivals():
     return res
 def get_station_route_arrival():
     global client
-    res = client.get_station_route_arrival(cityCode=22, nodeId='DGB7021050800', routeId='DGB3000653000')
+    res = client.get_station_route_arrival(cityCode=22, nodeId='DGB7021050700', routeId='DGB3000653000')
     return res
 
 if __name__ == "__main__":
 
     # print(client.get_route(22, routeId="DGB3000653000", routeNo="adf"))
-    pprint(get_station_arrivals())
+    for v in get_station_arrivals():
+        print(v.to_dict())
     pprint(get_station_route_arrival())

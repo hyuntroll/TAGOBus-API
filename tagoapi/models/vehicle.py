@@ -2,12 +2,46 @@ from .route import Route
 
 
 class Vehicle:
-    def __init__(self, route: Route, data: dict):
-        self.route = route 
-        self.gpsLati = data.get("gpslati")
-        self.gpsLong = data.get("gpslong")
-        self.nodeOrd = data.get("nodeord")
-        self.vehicleNo = data.get("vehicleno") # 다른 곳에서 표시할 때 이 이름도 함께
+    def __init__(
+            self,
+            route: Route = None, 
+            routeId: str = None, # test
+            routeNo: str = None, # test
+            gpsLati: float = None,
+            gpsLong: float = None,
+            arrtime: int = None,
+            arrprevstationcnt: int = None,
+            vehicleTp: str = None,
+            vehicleNo: str = None
+        ):
+        self.route = route
+        self.routeNo = routeNo
+        self.gpsLati = gpsLati
+        self.gpsLong = gpsLong
+        self.arrtime = arrtime
+        self.arrprevstationcnt = arrprevstationcnt
+        self.vehicleTp = vehicleTp
+        self.vehicleNo = vehicleNo
     
     def __repr__(self):
-        return f"<Route {self.route.routeNo} - {self.vehicleNo}>"
+        return f"<Vehicle: {self.routeNo} - {self.vehicleNo}>"
+    
+    def to_dict(self):
+        return vars(self)
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> "Vehicle":
+        return cls(
+            route=data.get("route"),
+            routeNo=data.get("routeno"),
+            gpsLati=data.get("gpslati"),
+            gpsLong=data.get("gpslong"),
+            arrtime=data.get("arrtime"),
+            arrprevstationcnt=data.get("arrprevstationcnt"),
+            vehicleTp=data.get("vehicletp"),
+            vehicleNo=data.get("vehicleno")
+        )
+    
+    @classmethod
+    def from_list(cls, data:list[dict]) -> list["Vehicle"]:
+        return [ cls.from_dict(vehicle) for vehicle in data]

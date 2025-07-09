@@ -18,8 +18,11 @@ if __name__ == "__main__":
         {'routeid': 'DGB2000003100', 'routeno': '순환3-1', 'routetp': '순환버스', 'endnode': None, 'startnode': None, 'endvehicletime': 2220, 'startvehicletime': 530}
     ]
     
-    pprint(Route.from_list(test_lst))
+    lst = Route.from_list(test_lst)
 
+    print( Vehicle(route=lst[0]).to_dict())
+
+    print(TAGOClient(TAGOAuth('45'))._get1("34", new=None, ka=4, jkadf=34))
     print(strip_meta(
         {"response": {
             "body": {
@@ -31,3 +34,4 @@ if __name__ == "__main__":
             }
         }}
     ))
+    
