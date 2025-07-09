@@ -1,10 +1,13 @@
 from .auth import TAGOAuth
 from .models import *
 from .cache import Cache
-from typing import Union
+from typing import Union, Callable, TypeVar
 import requests
 import os
 from time import time
+
+T = TypeVar('T', dict, list) # list, dict으로 매개변수 받을 때
+U = TypeVar('U', dict, list) # list, dict으로 반환할 때
 
 CACHE_PATH = 'caches/cache.pkl' 
 cache = Cache()
@@ -36,7 +39,10 @@ def generate_cache_key(*args, _fname: str, **kwargs) -> str:
     #             f"{key}={value}" for key, value in kwargs.items()
     #         )
 
-def parse_metadata(res: dict) -> dict | list:
+def convert(res: T, converter: Callable[[T], U]) -> U:
+    return converter(res)
+
+def parse_metadata(res: dict) -> U:
     striped = res.get("response", {}).get("body", {}).get("items", {})
     if isinstance(striped, dict):
         return striped.get("item", None)
@@ -44,19 +50,19 @@ def parse_metadata(res: dict) -> dict | list:
     return None
 
 
-def prepare_params(
-        auth: TAGOAuth, 
-        params: dict = dict(), 
+def build_params(
+        auth: TAGOAuth,  
         numOfRows: int = 10, 
-        pageNo: int = 1
+        pageNo: int = 1,
+        **kwargs: dict
     ) -> dict:
 
     return {
-        **params,
         "serviceKey": auth.getServiceKey(),
         "numOfRows": numOfRows,
         "pageNo": pageNo,
-        "_type": "json"
+        "_type": "json",
+        **{key: value for key, value in kwargs.items() if value}
         }
 
 def get_city_code(serviceKey) -> dict:

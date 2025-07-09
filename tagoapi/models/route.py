@@ -18,14 +18,14 @@ class Route:
 
         self.routeId = routeId
         self.routeNo = routeNo
-        self.routeTp = routeTp # 버스 종류는 저장 안해도 될듯;
+        self.routeTp = routeTp
         self.endnode = endNode # 다른 곳에서 표시할 땐 이름으로
         self.startnode = startNode
         self.endvehicletime = endvehicletime
         self.startvehicletime = startvehicletime
 
     def __repr__(self):
-        return f"<Route: {self.routeNo}>"
+        return f"Route({self.routeNo})"
     
     def to_dict(self):
         return vars(self)
