@@ -7,10 +7,10 @@ load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient( auth=TAGOAuth(api_key) )
 
+print(client.get_route_pos(22, "DGB3000653000"))
 
-print(client.get_station_arrivals(22, "DGB7021050800"))
+print(client.get_route_pos_near_station(22, "DGB3000653000","DGB7021050800"))
 
-print(client.get_station_route_arrival(22, "DGB7021050800", "DGB3000653000"))
 
 
 

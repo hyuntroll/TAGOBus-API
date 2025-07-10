@@ -25,7 +25,7 @@ class Vehicle:
         self.vehicleNo = vehicleNo
     
     def __repr__(self):
-        return f"Vehicle({self.routeId} - {self.vehicleNo})"
+        return f"Vehicle({self.routeNo} - {self.vehicleNo})"
     
     def to_dict(self):
         return vars(self)
@@ -34,8 +34,8 @@ class Vehicle:
     def from_dict(cls, data: dict) -> "Vehicle":
         return cls(
             route=data.get("route"),
-            routeId=data.get("routeid", data.get("routenm")),
-            routeNo=data.get("routeno"),
+            routeId=data.get("routeid"),
+            routeNo=data.get("routeno", data.get("routenm")),
             gpsLati=data.get("gpslati"),
             gpsLong=data.get("gpslong"),
             arrtime=data.get("arrtime"),

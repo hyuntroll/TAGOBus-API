@@ -11,7 +11,10 @@ gps_lst = client.get_station_by_gps(35.86613, 128.600068)
 pprint([i.to_dict() for i in gps_lst])
 
 st_lst = client.get_station_by_route(22, "DGB3000653000")
-pprint([i.to_dict() for i in st_lst])
+print(st_lst)
+
+test_ = client.get_station(22, nodeNm="민들레아파트후문건너")
+print(test_[0].nodeId)
 
 
 

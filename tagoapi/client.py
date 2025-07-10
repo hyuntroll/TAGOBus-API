@@ -42,7 +42,7 @@ class TAGOClient:
     ) -> Route:
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Route)
+        return self._fetch_and_convert(endpoint, params, Route, is_list=False)
 
     @from_cache_or_fetch()
     def get_routes_by_stations(
@@ -91,20 +91,20 @@ class TAGOClient:
         self,
         cityCode: int,
         nodeId: str,
-    ) -> list[Vehicle]:
+    ) -> list[ArrivalInfo]:
         endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle)
+        return self._fetch_and_convert(endpoint, params, ArrivalInfo)
     
     def get_station_route_arrival(
         self,
         cityCode: int,
         nodeId: str,
         routeId: str,
-    ) -> list[Vehicle]:
+    ) -> list[ArrivalInfo]:
         endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle)
+        return self._fetch_and_convert(endpoint, params, ArrivalInfo)
     
 
     def get_route_pos(
@@ -121,10 +121,10 @@ class TAGOClient:
         cityCode: int,
         routeId: int,
         nodeId: int,
-    ) -> dict:
+    ) -> list[Vehicle]:
         endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode, "routeId": routeId, "nodeId": nodeId})
-        return res
+        params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
+        return self._fetch_and_convert(endpoint, params, Vehicle)
 
 
     # def _get(self, endpoint: str, params: dict) -> dict:
