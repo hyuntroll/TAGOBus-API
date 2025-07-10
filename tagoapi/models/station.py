@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
+from .basemodel import BaseModel
 if TYPE_CHECKING:
     from .route import Route
 
-class Station:
+class Station(BaseModel):
     def __init__(
         self,
         nodeId: str,
@@ -47,4 +48,8 @@ class Station:
     @classmethod
     def from_list(cls, data: list[dict]) -> list["Station"]:
         return [cls.from_dict(station) for station in data]
+    
+    @property
+    def cache_key(self):
+        return "Station:<nodeId><nodenm>"
     

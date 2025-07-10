@@ -1,6 +1,7 @@
+from .basemodel import BaseModel
 
 
-class ArrivalInfo:
+class ArrivalInfo(BaseModel):
     def __init__(self,
         # nodeid,
         # nodenm,

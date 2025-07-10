@@ -1,7 +1,7 @@
 from .route import Route
+from .basemodel import BaseModel
 
-
-class Vehicle:
+class Vehicle(BaseModel):
     def __init__(
             self,
             route: Route = None, 

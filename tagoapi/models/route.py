@@ -1,9 +1,12 @@
 from typing import TYPE_CHECKING
+from .basemodel import BaseModel
+
 if TYPE_CHECKING:
     from .station import Station
 
+
 # 버스 노선 자체에 관한 정보
-class Route:
+class Route(BaseModel):
     def __init__(
         self,
         routeId: str,
@@ -43,3 +46,8 @@ class Route:
     @classmethod
     def from_list(cls, data: list[dict]) -> list["Route"]:
         return [ cls.from_dict(route) for route in data ]
+    
+
+    @property
+    def cache_key(self):
+        return "Route:<routeId>"

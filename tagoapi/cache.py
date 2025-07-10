@@ -27,7 +27,6 @@ class Cache:
         }
         with open(self.path, 'wb') as f:
             pickle.dump(self._cache, f)
-            
         
         return True
     

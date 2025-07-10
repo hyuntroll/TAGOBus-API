@@ -139,7 +139,7 @@ class TAGOClient:
             self, 
             endpoint: str, 
             params: dict, 
-            model,
+            model: BaseModel,
             is_list: bool = True
         ) -> U:
             res = parse_metadata(self._get(endpoint, params))
@@ -156,19 +156,20 @@ class TAGOClient:
         # 모두 추출하지 못한 경우 -> 더 추출해야함
         return response.json()
 
-    def _generate_route(self, res: dict) -> Union[list[Route], Route]:
-        totalCount = res.get("totalCount", None)
-        item = res.get("item", None)
-        if not totalCount and not item: # 총 개수랑 item이 없을 경우
-            return None
-        elif not totalCount and item: # 아이템이 하나인 경우
-            return Route.from_dict(item)
-        else:
-            return Route.from_list(item) # 아이템이 여러개인 경우
 
 
 
 
+
+# def _generate_route(self, res: dict) -> Union[list[Route], Route]:
+#     totalCount = res.get("totalCount", None)
+#     item = res.get("item", None)
+#     if not totalCount and not item: # 총 개수랑 item이 없을 경우
+#         return None
+#     elif not totalCount and item: # 아이템이 하나인 경우
+#         return Route.from_dict(item)
+#     else:
+#         return Route.from_list(item) # 아이템이 여러개인 경우
 
 # def _generate_route(self, res: dict) -> Union[list[Route], Route]:
 #     count = res.get("totalCount", None)
