@@ -10,6 +10,9 @@ class Station:
         nodeNo: int = None,
         gpsLati: float = None,
         gpsLong: float = None,
+        cityCode: int = None,
+        updowncd: int = None,
+        nodeord: int = None
         # *routeList: list['Route']
     ):
         self.nodeId = nodeId
@@ -17,10 +20,13 @@ class Station:
         self.nodeNo = nodeNo
         self.gpsLati = gpsLati
         self.gpsLong = gpsLong
+        self.cityCode = cityCode
+        self.updowncd = updowncd
+        self.nodeord = nodeord
         # self.routeList = routeList
 
     def __repr__(self):
-        return f"<Station: {self.nodeNm}>"
+        return f"Station({self.nodeNm})"
     
     def to_dict(self):
         return vars(self)
@@ -33,7 +39,9 @@ class Station:
             nodeNo = data.get("nodeno"),
             gpsLati = float(data.get("gpslati")),
             gpsLong = float(data.get("gpslong")),
-
+            cityCode = data.get("citycode"),
+            updowncd = data.get("updowncd"),
+            nodeord = data.get("nodeord")
         )
     
     @classmethod

@@ -1,13 +1,13 @@
 from .auth import TAGOAuth
 from .models import *
 from .cache import Cache
-from typing import Union, Callable, TypeVar
+from typing import Union, Callable, TypeVar, Any
 import requests
 import os
 from time import time
 
 T = TypeVar('T', dict, list) # list, dict으로 매개변수 받을 때
-U = TypeVar('U', dict, list) # list, dict으로 반환할 때
+U = TypeVar('U', dict[str], list) # list, dict으로 반환할 때
 
 CACHE_PATH = 'caches/cache.pkl' 
 cache = Cache()
@@ -38,10 +38,6 @@ def generate_cache_key(*args, _fname: str, **kwargs) -> str:
     # return endpoint + "?" + "&".join(
     #             f"{key}={value}" for key, value in kwargs.items()
     #         )
-
-def convert(res: T, converter: Callable[[T], U]) -> U:
-    return converter(res)
-
 def parse_metadata(res: dict) -> U:
     striped = res.get("response", {}).get("body", {}).get("items", {})
     if isinstance(striped, dict):
@@ -49,6 +45,10 @@ def parse_metadata(res: dict) -> U:
 
     return None
 
+def convert(res: T, converter: Callable[[T], U]) -> U:
+    if not res:
+        return None
+    return converter(res)
 
 def build_params(
         auth: TAGOAuth,  

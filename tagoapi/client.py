@@ -18,43 +18,11 @@ class TAGOClient:
         self.auth = auth
 
         # self._cache = Cache()
-    
-    @from_cache_or_fetch(86400)
-    def get_station(
-        self,
-        cityCode: int,
-        nodeId: str = '',
-        nodeNm: str = '',
-        nodeNo: str = None
-    ) -> Union[list[Station], Station]:
-        
-        return None
 
-    def get_station_arrivals(
-        self,
-        cityCode: int,
-        nodeId: str,
-    ) -> list[Vehicle]:
-        endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode, "nodeId": nodeId})
-        if res["totalCount"] == 0:
-            return []
-        vc_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-        return Vehicle.from_list(vc_list)
-    
-    def get_station_route_arrival(
-        self,
-        cityCode: int,
-        nodeId: str,
-        routeId: str,
-    ) -> list[Vehicle]:
-        endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode,"nodeId": nodeId,"routeId": routeId,})
-        if res["totalCount"] == 0:
-            return []
-        vc_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-        return Vehicle.from_list(vc_list)
-    
+    @overload
+    def get_station(self, cityCode: int, nodeNo: int) -> list[Station]: ...
+    @overload
+    def get_station(self, cityCode: int, nodeNo: Optional[int], nodeNm: str) -> list[Station]: ...
 
     @from_cache_or_fetch(604800)
     def get_route_by_no(
@@ -64,13 +32,7 @@ class TAGOClient:
     ) -> list[Route]:
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
-        res = parse_metadata(self._get1(endpoint, params=params))
-        if res is None:
-            return None
-        if isinstance(res, list):
-            return convert(res, Route.from_list)
-        else:
-            return convert([res], Route.from_list)
+        return self._fetch_and_convert(endpoint, params,Route)
         
     @from_cache_or_fetch(604800)
     def get_route_by_id(
@@ -80,59 +42,8 @@ class TAGOClient:
     ) -> Route:
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        res = parse_metadata(self._get1(endpoint, params=params))
-        if res is None:
-            return None
-        
-        return convert(res, Route.from_dict)
+        return self._fetch_and_convert(endpoint, params, Route)
 
-
-
-    @from_cache_or_fetch(604800)
-    def get_stations_by_route(
-        self,
-        cityCode: int,
-        routeId: str
-    ) -> list[Route]:
-        endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
-        res = self._get(endpoint, params={"cityCode": cityCode, "routeId": routeId})
-        if res["totalCount"] == 0:
-            return []
-        station_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-        return Station.from_list(station_list)
-    
-    @from_cache_or_fetch(86400)
-    def get_station_info_by_name(
-        self,
-        cityCode: int,
-        nodeNm: str = '',
-        nodeNo: str = ''
-    ) -> list[Station]:
-        endpoint = f'{self.BUSTATION}/getSttnNoList'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode,"nodeNm": nodeNm,"nodeNo": nodeNo})
-        if res["totalCount"] == 0:
-            return []
-        
-        station_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-        return Station.from_list(station_list)
-    
-    @from_cache_or_fetch()
-    def get_station_info_by_gps(
-        self,
-        cityCode: int,
-        gpsLati: int,
-        gpsLong: int
-    ) -> list[Station]:
-        endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode,"gpsLati": gpsLati,"gpsLong": gpsLong})
-
-
-        if res["totalCount"] == 0:
-            return []
-        
-        station_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-        return Station.from_list(station_list)
-    
     @from_cache_or_fetch()
     def get_routes_by_stations(
         self,
@@ -140,22 +51,70 @@ class TAGOClient:
         nodeId: str
     ) -> list[Route]:
         endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode, "nodeId": nodeId})
+        params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
+        return self._fetch_and_convert(endpoint, params, Route)
+    
 
-        if res["totalCount"] == 0:
-            return []
-        route_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-        return Route.from_list(route_list)
+    @from_cache_or_fetch(604800)
+    def get_station_by_route(
+        self,
+        cityCode: int,
+        routeId: str
+    ) -> list[Route]:
+        endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
+        params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
+        return self._fetch_and_convert(endpoint, params, Station)
+    
+    @from_cache_or_fetch(86400)
+    def get_station(
+        self,
+        cityCode: int,
+        nodeNo: int = None,
+        nodeNm: str = None,
+    ) -> list[Station]:
+        endpoint = f'{self.BUSTATION}/getSttnNoList'
+        params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
+        return self._fetch_and_convert(endpoint, params, Station)
+    
+    @from_cache_or_fetch(86400)
+    def get_station_by_gps(
+        self,
+        gpsLati: float,
+        gpsLong: float
+    ) -> list[Station]:
+        endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
+        params = build_params(self.auth, gpsLati=gpsLati, gpsLong=gpsLong)
+        return self._fetch_and_convert(endpoint, params, Station)
+
+
+    def get_station_arrivals(
+        self,
+        cityCode: int,
+        nodeId: str,
+    ) -> list[Vehicle]:
+        endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
+        params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
+        return self._fetch_and_convert(endpoint, params, Vehicle)
+    
+    def get_station_route_arrival(
+        self,
+        cityCode: int,
+        nodeId: str,
+        routeId: str,
+    ) -> list[Vehicle]:
+        endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
+        params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId, routeId=routeId)
+        return self._fetch_and_convert(endpoint, params, Vehicle)
     
 
     def get_route_pos(
         self, 
         cityCode: int,
         routeId: int,
-    ) -> dict:
+    ) -> list[Vehicle]:
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
-        res = self._get(endpoint=endpoint, params={"cityCode": cityCode, "routeId": routeId})
-        return res
+        params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
+        return self._fetch_and_convert(endpoint, params, Vehicle)
 
     def get_route_pos_near_station(
         self, 
@@ -176,8 +135,22 @@ class TAGOClient:
     #     striped_data = parse_metadata(response.json())
 
     #     return striped_data
+    def _fetch_and_convert(
+            self, 
+            endpoint: str, 
+            params: dict, 
+            model,
+            is_list: bool = True
+        ) -> U:
+            res = parse_metadata(self._get(endpoint, params))
+            if not res: 
+                return None 
+            if isinstance(res, list): 
+                return convert(res, model.from_list) 
+            else: 
+                return convert([res], model.from_list) if is_list else convert(res,  model.from_dict) 
     
-    def _get1(self, endpoint: str, params: dict) -> any:
+    def _get(self, endpoint: str, params: dict) -> any:
         response = requests.get(f"{self.BASE_URL}/{endpoint}", params=params)
         response.raise_for_status()
         # 모두 추출하지 못한 경우 -> 더 추출해야함
@@ -245,5 +218,5 @@ class TAGOClient:
 #     else:
 #         raise ValueError("At least one argument must be non-None.")
 
-#     # return self._get1(endpoint, cityCode=cityCode, routeNo=routeNo, routeId=routeId)
-#     # return self._generate_route(self._get1(endpoint, cityCode=cityCode, routeNo=routeNo, routeId=routeId))
+#     # return self._get(endpoint, cityCode=cityCode, routeNo=routeNo, routeId=routeId)
+#     # return self._generate_route(self._get(endpoint, cityCode=cityCode, routeNo=routeNo, routeId=routeId))
