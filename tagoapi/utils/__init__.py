@@ -5,6 +5,7 @@ from .parser import parse_metadata
 from .convertor import convert
 from .parser import KeyExtract
 from .params import build_params
+from .http import http_get
 
 
 
@@ -15,5 +16,6 @@ __all__ = [
     "parse_metadata",
     "convert",
     "build_params",
-    "cache"
+    "cache",
+    "http_get"
 ]

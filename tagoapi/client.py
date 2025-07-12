@@ -176,8 +176,7 @@ class TAGOClient:
             return [result] if is_list else result
 
     def _get(self, endpoint: str, params: dict) -> any:
-        response = requests.get(f"{self.BASE_URL}/{endpoint}", params=params)
-        response.raise_for_status()
+        response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)
         # 모두 추출하지 못한 경우 -> 더 추출해야함
         return response.json()
 
