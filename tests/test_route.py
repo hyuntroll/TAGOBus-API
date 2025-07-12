@@ -7,14 +7,14 @@ load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient(auth=TAGOAuth(api_key))
 
-lst = client.get_route_by_no(cityCode=22, routeNo="순환")
+lst = client.get_route_by_no(cityCode=22, routeNo="4")
 pprint([i.to_dict() for i in lst])
 
-test_dict = client.get_route_by_id(22, routeId="DGB3000653000")
-pprint(test_dict.to_dict())
+test_dict = client.get_route_by_id(22, routeId="DGB1000008101")
+print(test_dict)
 
-lst_st = client.get_routes_by_stations(22, "DGB7001009400")
-pprint([i.to_dict() for i in lst_st])
+lst_st = client.get_route_by_station(22, "DGB7001009400")
+pprint([i.to_dict() for i in     lst_st])
 
 
 # def get_route_list():

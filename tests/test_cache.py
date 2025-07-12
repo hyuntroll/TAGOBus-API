@@ -11,12 +11,13 @@ api_key = os.getenv('TAGO_API_KEY')
 #     get_city_code(api_key)
 # )
 
-test1 = KeyExtract(Route("23"))
+test1 = KeyExtract(Route)
 test2 = KeyExtract(Station("34", "45"))
 
-print(test1.generate_key(routeId="843"))
-print(test2.generate_key(nodeId="34", nodenm="46"))
+# print(test1.generate_key(routeId="843"))
+# print(test2.generate_key(nodeId="34", nodenm="46"))
 
+pprint(cache.current_cache)
 
 ## test decorater
 class Universe:

@@ -7,8 +7,11 @@ from .models import Route
 from .models import Vehicle
 from .models import Station
 
-from .utils import get_city_code
-from .utils import from_cache_or_fetch
-from .utils import KeyExtract
+# from .utils import get_city_code
+from .utils.cache_util import from_cache_or_fetch
+from .utils.parser import KeyExtract
+from .utils.cache_util import cache
 
-__all__ = [ 'TAGOClient', 'TAGOAuth', 'get_city_code', 'from_cache_or_fetch', 'Route', 'Vehicle', 'Station', 'KeyExtract' ]
+
+
+__all__ = [ 'TAGOClient', 'TAGOAuth', 'from_cache_or_fetch', 'Route', 'Vehicle', 'Station', 'KeyExtract', 'cache' ]

@@ -4,6 +4,9 @@ if TYPE_CHECKING:
     from .route import Route
 
 class Station(BaseModel):
+    # cache_key = "Station:<nodeId><nodenm>"
+    cache_key = "Station:<nodeId>"
+    
     def __init__(
         self,
         nodeId: str,
@@ -48,8 +51,4 @@ class Station(BaseModel):
     @classmethod
     def from_list(cls, data: list[dict]) -> list["Station"]:
         return [cls.from_dict(station) for station in data]
-    
-    @property
-    def cache_key(self):
-        return "Station:<nodeId><nodenm>"
     

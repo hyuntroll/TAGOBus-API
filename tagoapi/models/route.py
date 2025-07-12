@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 # 버스 노선 자체에 관한 정보
 class Route(BaseModel):
+    cache_key = "Route:<routeId>"
+
     def __init__(
         self,
         routeId: str,
@@ -46,8 +48,3 @@ class Route(BaseModel):
     @classmethod
     def from_list(cls, data: list[dict]) -> list["Route"]:
         return [ cls.from_dict(route) for route in data ]
-    
-
-    @property
-    def cache_key(self):
-        return "Route:<routeId>"

@@ -1,6 +1,11 @@
 from .exceptions import *
 from .utils import *
+from .models import *
+from .auth import TAGOAuth
+
 from typing import Union, Optional, overload
+import requests
+
 
 
 class TAGOClient:
@@ -9,6 +14,7 @@ class TAGOClient:
     BUSROUTE = 'BusRouteInfoInqireService'
     BUSTATION = "BusSttnInfoInqireService"
     BUSPOS = "BusLcInfoInqireService"
+    CACHE_TTL = 604800
 
 
     def __init__(self, auth: TAGOAuth):
@@ -45,7 +51,7 @@ class TAGOClient:
         return self._fetch_and_convert(endpoint, params, Route, is_list=False)
 
     @from_cache_or_fetch()
-    def get_routes_by_stations(
+    def get_route_by_station(
         self,
         cityCode: int,
         nodeId: str
@@ -72,6 +78,9 @@ class TAGOClient:
         nodeNo: int = None,
         nodeNm: str = None,
     ) -> list[Station]:
+        if not (nodeNo or nodeNm):
+            raise ValueError("Only one of 'nodeNo' or 'nodeNm' should be provided.")
+
         endpoint = f'{self.BUSTATION}/getSttnNoList'
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
         return self._fetch_and_convert(endpoint, params, Station)
@@ -87,7 +96,7 @@ class TAGOClient:
         return self._fetch_and_convert(endpoint, params, Station)
 
 
-    def get_station_arrivals(
+    def get_arrival_by_station(
         self,
         cityCode: int,
         nodeId: str,
@@ -96,7 +105,7 @@ class TAGOClient:
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
         return self._fetch_and_convert(endpoint, params, ArrivalInfo)
     
-    def get_station_route_arrival(
+    def get_route_arrival_by_station(
         self,
         cityCode: int,
         nodeId: str,
@@ -127,29 +136,45 @@ class TAGOClient:
         return self._fetch_and_convert(endpoint, params, Vehicle)
 
 
-    # def _get(self, endpoint: str, params: dict) -> dict:
-    #     response = requests.get(f"{self.BASE_URL}/{endpoint}", 
-    #         params=prepare_params(self.auth, params))
-        
-    #     response.raise_for_status()
-    #     striped_data = parse_metadata(response.json())
 
-    #     return striped_data
     def _fetch_and_convert(
             self, 
             endpoint: str, 
             params: dict, 
             model: BaseModel,
-            is_list: bool = True
-        ) -> U:
-            res = parse_metadata(self._get(endpoint, params))
-            if not res: 
-                return None 
-            if isinstance(res, list): 
-                return convert(res, model.from_list) 
-            else: 
-                return convert([res], model.from_list) if is_list else convert(res,  model.from_dict) 
-    
+            is_list: bool = True,
+            is_cache: bool = True
+    ) -> BaseModel:
+        cache_key = KeyExtract(model)
+        response = parse_metadata(self._get(endpoint, params))
+        if not response: 
+            return None 
+        if isinstance(response, list):
+            if not is_cache:
+                return convert(response, model.from_list)
+            result = []
+            for v in response:
+                key = cache_key.generate_key(v)
+                cached = cache.get(key)
+                if cached:
+                    result.append(cached)
+                else:
+                    parsed_obj = convert(v, model.from_dict)
+                    result.append(parsed_obj)
+                    cache.save(key, parsed_obj, self.CACHE_TTL)
+
+            return result
+
+        else:
+            if is_cache: 
+                key = cache_key.generate_key(response)
+                cached = cache.get(key)
+                if cached:
+                    return [cached] if is_list else cached
+            result = convert(response, model.from_dict)
+            cache.save(key, result, self.CACHE_TTL)
+            return [result] if is_list else result
+
     def _get(self, endpoint: str, params: dict) -> any:
         response = requests.get(f"{self.BASE_URL}/{endpoint}", params=params)
         response.raise_for_status()
@@ -160,7 +185,14 @@ class TAGOClient:
 
 
 
+# def _get(self, endpoint: str, params: dict) -> dict:
+#     response = requests.get(f"{self.BASE_URL}/{endpoint}", 
+#         params=prepare_params(self.auth, params))
+    
+#     response.raise_for_status()
+#     striped_data = parse_metadata(response.json())
 
+#     return striped_data
 # def _generate_route(self, res: dict) -> Union[list[Route], Route]:
 #     totalCount = res.get("totalCount", None)
 #     item = res.get("item", None)

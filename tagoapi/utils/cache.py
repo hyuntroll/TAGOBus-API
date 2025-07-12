@@ -34,14 +34,16 @@ class Cache:
         entry = self._cache.get(key)
         if not entry:
             return None
-        
 
         value, saved_time, ttl = entry["value"], entry["saved_time"], entry["ttl"]
         
         if time() - saved_time > ttl:
             del self._cache[key]
             return None
-        
-        
+
         return value
+    
+    @property
+    def current_cache(self):
+        return self._cache
 
