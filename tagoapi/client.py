@@ -7,7 +7,6 @@ from typing import Union, Optional, overload
 import requests
 
 
-
 class TAGOClient:
     BASE_URL = "http://apis.data.go.kr/1613000"
     AVRINFO = "ArvlInfoInqireService"
@@ -22,8 +21,6 @@ class TAGOClient:
             raise TypeError("Expected 'auth' to be an instance of TAGOAuth")
         
         self.auth = auth
-
-        # self._cache = Cache()
 
     @overload
     def get_station(self, cityCode: int, nodeNo: int) -> list[Station]: ...
@@ -183,72 +180,3 @@ class TAGOClient:
 
 
 
-
-# def _get(self, endpoint: str, params: dict) -> dict:
-#     response = requests.get(f"{self.BASE_URL}/{endpoint}", 
-#         params=prepare_params(self.auth, params))
-    
-#     response.raise_for_status()
-#     striped_data = parse_metadata(response.json())
-
-#     return striped_data
-# def _generate_route(self, res: dict) -> Union[list[Route], Route]:
-#     totalCount = res.get("totalCount", None)
-#     item = res.get("item", None)
-#     if not totalCount and not item: # 총 개수랑 item이 없을 경우
-#         return None
-#     elif not totalCount and item: # 아이템이 하나인 경우
-#         return Route.from_dict(item)
-#     else:
-#         return Route.from_list(item) # 아이템이 여러개인 경우
-
-# def _generate_route(self, res: dict) -> Union[list[Route], Route]:
-#     count = res.get("totalCount", None)
-#     if count == 0 or res.get("items").get("item"):
-#         return []
-#     elif count == None:
-#         pass
-#     route_list = res["items"]["item"] if isinstance(res["items"]["item"], list) else [res["items"]["item"]]
-#     return Route.from_list(route_list)
-
-
-# def _from_cache_with_params(
-#     self, 
-#     endpoint: str, 
-#     params: dict, 
-#     ttl:int = 86400
-# ) -> dict:
-    
-#     key = endpoint + "?" + "&".join(
-#         f"{key}={value}" for key, value in params.items()
-#     )
-#     cached = cache.get(key)
-#     if cached:
-#         return cached
-#     else:
-#         return False
-
-
-# @overload
-# def get_route(self, cityCode: int, routeNo: str) -> Union[list[Route], Route]: ...
-# @overload
-# def get_route(self, cityCode: int, routeId: str) -> Route: ...
-
-# @from_cache_or_fetch(604800)
-# def get_route(
-#     self,
-#     cityCode: int,
-#     routeNo: Optional[str] = None,
-#     routeId: Optional[str] = None
-# ) -> Union[list[Route], Route]:
-#     if routeNo and routeId:
-#         raise ValueError("Only one of 'routeId' or 'routeNo' should be provided.")
-#     if routeNo:
-#         return self._get_route_by_routeNo(cityCode, routeNo)
-#     elif routeId:
-#         return self._get_route_info(cityCode, routeId)
-#     else:
-#         raise ValueError("At least one argument must be non-None.")
-
-#     # return self._get(endpoint, cityCode=cityCode, routeNo=routeNo, routeId=routeId)
-#     # return self._generate_route(self._get(endpoint, cityCode=cityCode, routeNo=routeNo, routeId=routeId))
