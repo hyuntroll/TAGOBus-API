@@ -5,7 +5,8 @@ class TAGOAuth:
         if not isinstance(serviceKey, str):
             raise TypeError("Service key must be a string")
         
-        self.serviceKey = serviceKey
+        self._serviceKey = serviceKey
 
-    def getServiceKey(self):
-        return self.serviceKey
+    @property
+    def serviceKey(self):
+        return self._serviceKey

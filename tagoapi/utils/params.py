@@ -11,7 +11,7 @@ def build_params(
     ) -> dict:
 
     return {
-        "serviceKey": auth.getServiceKey(),
+        "serviceKey": auth.serviceKey,
         "numOfRows": numOfRows,
         "pageNo": pageNo,
         "_type": "json",
