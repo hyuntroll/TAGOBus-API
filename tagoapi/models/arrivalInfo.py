@@ -3,20 +3,20 @@ from .basemodel import BaseModel
 
 class ArrivalInfo(BaseModel):
     def __init__(self,
-        # nodeid,
-        # nodenm,
+        nodeid,
+        nodenm,
         routeId: str,
         routeNo: str,
-        # routetp,
+        routetp,
         arrprevstationcnt: int = None,
         vehicletp: str = None,
         arrtime: int = None
     ):
-        # self.nodeid = nodeid
-        # self.nodenm = nodenm
+        self.nodeid = nodeid
+        self.nodenm = nodenm
         self.routeId = routeId
         self.routeNo = routeNo
-        # self.routetp = routetp
+        self.routetp = routetp
         self.arrprevstationcnt = arrprevstationcnt
         self.vehicletp = vehicletp
         self.arrtime = arrtime
@@ -30,6 +30,9 @@ class ArrivalInfo(BaseModel):
     @classmethod
     def from_dict(cls, data: dict) -> "ArrivalInfo":
         return cls(
+            nodeid=data.get("nodeid"),
+            nodenm=data.get("nodeid"),
+            routetp=data.get("routetp"),
             routeId = data.get("routeid"),
             routeNo = data.get("routeno"),
             arrprevstationcnt = data.get("arrprevstationcnt"),

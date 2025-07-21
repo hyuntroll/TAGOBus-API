@@ -14,8 +14,8 @@ class Route(BaseModel):
         routeId: str,
         routeNo: str = None,
         routeTp: str = None,
-        endNode: "Station" = None,
-        startNode: "Station" = None,
+        endNodeNm: str = None,
+        startNodeNm: str = None,
         endvehicletime: int = None,
         startvehicletime: int = None,
         #TODO: 정류장 리스트도 넣으면 좋을 듯 합니당
@@ -24,8 +24,8 @@ class Route(BaseModel):
         self.routeId = routeId
         self.routeNo = routeNo
         self.routeTp = routeTp
-        self.endnode = endNode # 다른 곳에서 표시할 땐 이름으로
-        self.startnode = startNode
+        self.endNodeNm = endNodeNm # 다른 곳에서 표시할 땐 이름으로
+        self.startNodeNm = startNodeNm
         self.endvehicletime = endvehicletime
         self.startvehicletime = startvehicletime
 
@@ -41,6 +41,8 @@ class Route(BaseModel):
             routeId=data["routeid"],
             routeNo=data["routeno"],
             routeTp=data["routetp"],
+            startNodeNm=data.get("startnodenm"),
+            endNodeNm=data.get("endnodenm"),
             endvehicletime=data.get("endvehicletime"),
             startvehicletime=data.get("startvehicletime")
         )

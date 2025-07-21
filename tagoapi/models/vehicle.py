@@ -3,17 +3,17 @@ from .basemodel import BaseModel
 
 class Vehicle(BaseModel):
     def __init__(
-            self,
-            route: Route = None, 
-            routeId: str = None, # test
-            routeNo: str = None, # test
-            gpsLati: float = None,
-            gpsLong: float = None,
-            arrtime: int = None,
-            arrprevstationcnt: int = None,
-            vehicleTp: str = None,
-            vehicleNo: str = None
-        ):
+        self,
+        route: Route = None, 
+        routeId: str = None,
+        routeNo: str = None,
+        gpsLati: float = None,
+        gpsLong: float = None,
+        arrtime: int = None,
+        arrprevstationcnt: int = None,
+        vehicleTp: str = None,
+        vehicleNo: str = None
+    ):
         self.route = route
         self.routeId = routeId
         self.routeNo = routeNo
