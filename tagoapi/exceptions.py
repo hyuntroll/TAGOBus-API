@@ -11,6 +11,13 @@ class ServiceKeyNotRegisteredError(TAGOAPIError):
     """등록되지 않은 서비스키를 사용"""
     pass
 
+class RequestExcessdsError(TAGOAPIError):
+    """서비스 요청제한횟수 초과 에러"""
+    pass
+
+class NoOpenAPIServiceError(TAGOAPIError):
+    """오픈 API 서비스가 없거나 페기됨"""
+    pass
 
 class TAGORequestError(TAGOAPIError):
     """요청 실패 (http 에러, 타임아웃 등)"""
