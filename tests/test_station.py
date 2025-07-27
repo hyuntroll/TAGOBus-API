@@ -2,19 +2,30 @@ from tagoapi import *
 from dotenv import load_dotenv
 import os
 from pprint import pprint
+import time
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient(auth=TAGOAuth(api_key))
 
+
+start = time.time()
 gps_lst = client.get_station_by_gps(35.86613, 128.600068)
-pprint([i.to_dict() for i in gps_lst])
+end = time.time()
+print(gps_lst)
+print(f"{end - start:.5f}")
 
+start = time.time()
 st_lst = client.get_station_by_route(22, "DGB3000653000")
+end = time.time()
 print(st_lst)
+print(f"{end - start:.5f}")
 
+start = time.time()
 test_ = client.get_station(22, nodeNm="민들레아파트후문건너")
-print(test_[0].nodeId)
+end = time.time()
+print(test_)
+print(f"{end - start:.5f}")
 
 
 

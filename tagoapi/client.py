@@ -175,9 +175,10 @@ class TAGOClient:
     
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)
-        print(response)
         error_code = response.get("returnReasonCode")
         if error_code == '30':
-            raise ServiceKeyNotRegisteredError("유효하지 않는 ServiceKey 입니다.")
+            raise ServiceKeyNotRegisteredError("유효하지 않는 서비스키 입니다.")
+        elif error_code:
+            raise RuntimeError(f"실행중 오류가 발생했습니다. 에러코드: {error_code}")
 
         return response
