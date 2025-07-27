@@ -1,0 +1,7 @@
+import geopandas as gpd
+
+# Shapefile 로드 (shp, shx, dbf 등 자동 처리)
+gdf = gpd.read_file("BND_SIGUNGU_PG.shp")
+
+# GeoJSON으로 저장
+gdf.to_file("output.json", driver="GeoJSON")

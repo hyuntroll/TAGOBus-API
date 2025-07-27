@@ -5,15 +5,15 @@ if TYPE_CHECKING:
 
 def build_params(
         auth: "TAGOAuth",  
-        numOfRows: int = 10, 
+        numOfRows: int = 300, 
         pageNo: int = 1,
         **kwargs: dict
     ) -> dict:
-
+    
     return {
-        "serviceKey": auth.serviceKey,
-        "numOfRows": numOfRows,
-        "pageNo": pageNo,
-        "_type": "json",
-        **{key: value for key, value in kwargs.items() if value}
+            "serviceKey": auth.serviceKey,
+            "numOfRows": numOfRows,
+            "pageNo": pageNo,
+            "_type": "json",
+            **{key: value for key, value in kwargs.items() if value}
         }

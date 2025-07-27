@@ -2,15 +2,18 @@ from tagoapi import *
 from dotenv import load_dotenv
 import os
 from pprint import pprint
+import time 
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient( auth=TAGOAuth(api_key) )
 
+start = time.time()
+print(client.get_station_by_route(22, "DGB3000653000"))
+end = time.time()
+print(f"{end-start:5f} sec")
 
-print(client.get_station_arrivals(22, "DGB7021050800"))
-
-print(client.get_station_route_arrival(22, "DGB7021050800", "DGB3000653000"))
+# print(client.get_station_route_arrival(22, "DGB7021050800", "DGB3000653000"))
 
 
 

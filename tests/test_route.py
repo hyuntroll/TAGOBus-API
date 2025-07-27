@@ -2,19 +2,28 @@ from tagoapi import *
 from dotenv import load_dotenv
 import os
 from pprint import pprint
+import time
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient(auth=TAGOAuth(api_key))
 
-lst = client.get_route_by_no(cityCode=22, routeNo="4")
+start = time.time()
+lst = client.get_route_by_no(cityCode=22, routeNo="1")
+end = time.time()
+print(f"{end - start:.5f} sec")
 pprint([i.to_dict() for i in lst])
 
-test_dict = client.get_route_by_id(22, routeId="DGB1000008101")
-print(test_dict)
+start = time.time()
+print(client.get_route_by_id(22, "DGB1000008101"))
+end = time.time()
+print(f"{end - start:.5f} sec")
 
-lst_st = client.get_route_by_station(22, "DGB7001009400")
-pprint([i.to_dict() for i in     lst_st])
+# test_dict = client.get_route_by_id(22, routeId="DGB1000008101")
+# print(test_dict)
+
+# lst_st = client.get_route_by_station(22, "DGB7001009400")
+# pprint([i.to_dict() for i in lst_st])
 
 
 # def get_route_list():

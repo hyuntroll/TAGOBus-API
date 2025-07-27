@@ -4,7 +4,7 @@ from .models import *
 from .auth import TAGOAuth
 
 from typing import Union, Optional, overload
-import requests
+
 
 
 class TAGOClient:
@@ -35,7 +35,7 @@ class TAGOClient:
     ) -> list[Route]:
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
-        return self._fetch_and_convert(endpoint, params,Route)
+        return self._fetch_and_convert(endpoint, params, Route)
         
     @from_cache_or_fetch(604800)
     def get_route_by_id(
@@ -120,7 +120,7 @@ class TAGOClient:
     ) -> list[Vehicle]:
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle)
+        return self._fetch_and_convert(endpoint, params, Vehicle, is_cache=False)
 
     def get_route_pos_near_station(
         self, 
@@ -172,11 +172,12 @@ class TAGOClient:
             cache.save(key, result, self.CACHE_TTL)
             return [result] if is_list else result
 
+    
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)
-        # 모두 추출하지 못한 경우 -> 더 추출해야함
-        return response.json()
+        print(response)
+        error_code = response.get("returnReasonCode")
+        if error_code == '30':
+            raise ServiceKeyNotRegisteredError("유효하지 않는 ServiceKey 입니다.")
 
-
-
-
+        return response
