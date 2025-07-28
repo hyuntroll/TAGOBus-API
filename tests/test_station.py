@@ -16,15 +16,15 @@ print(gps_lst)
 print(f"{end - start:.5f}")
 
 start = time.time()
-st_lst = client.get_station_by_route(22, "DGB3000653000")
+st_lst = client.get_station_by_route(21, "DGB3000653000")
 end = time.time()
 print(st_lst)
 print(f"{end - start:.5f}")
 
 start = time.time()
-test_ = client.get_station(22, nodeNm="민들레아파트후문건너")
+test_ = client.get_station(12, nodeNm="중")
 end = time.time()
-print(test_)
+pprint([s.to_dict()for s in test_])
 print(f"{end - start:.5f}")
 
 

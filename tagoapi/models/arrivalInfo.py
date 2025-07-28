@@ -1,4 +1,4 @@
-from .basemodel import BaseModel
+from .BaseModel import BaseModel
 
 
 class ArrivalInfo(BaseModel):

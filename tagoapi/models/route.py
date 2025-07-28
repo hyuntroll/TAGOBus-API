@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
-from .basemodel import BaseModel
+from .BaseModel import BaseModel
 
 if TYPE_CHECKING:
-    from .station import Station
+    from .Station import Station
 
 
 # 버스 노선 자체에 관한 정보

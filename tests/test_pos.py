@@ -2,12 +2,19 @@ from tagoapi import *
 from dotenv import load_dotenv
 import os
 from pprint import pprint
+from method_time import timer
 
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient( auth=TAGOAuth(api_key) )
 
-print(client.get_route_pos(22, "DGB3000653000"))
+@timer
+def test_route_pos(cityCode, routeId):
+    global client
+    return client.get_route_pos(cityCode, routeId)
+
+
+print(client.get_route_pos(12, "SJB293000358"))
 
 print(client.get_route_pos_near_station(22, "DGB3000653000","DGB7021050800"))
 

@@ -22,8 +22,8 @@ print(f"{end - start:.5f} sec")
 # test_dict = client.get_route_by_id(22, routeId="DGB1000008101")
 # print(test_dict)
 
-# lst_st = client.get_route_by_station(22, "DGB7001009400")
-# pprint([i.to_dict() for i in lst_st])
+lst_st = client.get_route_by_station(12, "SJB293064486")
+pprint([i.to_dict() for i in lst_st])
 
 
 # def get_route_list():

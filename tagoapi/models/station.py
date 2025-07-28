@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
-from .basemodel import BaseModel
+from .BaseModel import BaseModel
 if TYPE_CHECKING:
-    from .route import Route
+    from .Route import Route
 
 class Station(BaseModel):
     # cache_key = "Station:<nodeId><nodenm>"

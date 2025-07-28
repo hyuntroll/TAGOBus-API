@@ -9,7 +9,7 @@ api_key = os.getenv('TAGO_API_KEY')
 client = TAGOClient( auth=TAGOAuth(api_key) )
 
 start = time.time()
-print(client.get_station_by_route(22, "DGB3000653000"))
+print(client.get_station_by_route(12, "DGB3000653000"))
 end = time.time()
 print(f"{end-start:5f} sec")
 

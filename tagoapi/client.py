@@ -63,7 +63,7 @@ class TAGOClient:
         self,
         cityCode: int,
         routeId: str
-    ) -> list[Route]:
+    ) -> list[Station]:
         endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Station)
