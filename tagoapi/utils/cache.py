@@ -1,5 +1,10 @@
 import os, pickle
 from time import time
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tagoapi import TAGOClient
+    from tagoapi import TAGOAuth
+
 
 CACHE_PATH = 'caches/cache.pkl' 
 

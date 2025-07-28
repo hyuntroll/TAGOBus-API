@@ -148,7 +148,7 @@ class TAGOClient:
             return None 
         if isinstance(response, list):
             if not is_cache:
-                return convert(response, model.from_list)
+                return convert(response, model.from_list, self)
             result = []
             for v in response:
                 key = cache_key.generate_key(v)
@@ -156,7 +156,7 @@ class TAGOClient:
                 if cached:
                     result.append(cached)
                 else:
-                    parsed_obj = convert(v, model.from_dict)
+                    parsed_obj = convert(v, model.from_dict, self)
                     result.append(parsed_obj)
                     cache.save(key, parsed_obj, self.CACHE_TTL)
 
@@ -168,7 +168,7 @@ class TAGOClient:
                 cached = cache.get(key)
                 if cached:
                     return [cached] if is_list else cached
-            result = convert(response, model.from_dict)
+            result = convert(response, model.from_dict, self)
             cache.save(key, result, self.CACHE_TTL)
             return [result] if is_list else result
 

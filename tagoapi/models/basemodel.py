@@ -2,12 +2,15 @@
 
 class BaseModel:
     cache_key = "BaseModel:<id>"
-    def __init__(self): ...
+    def __init__(self, client):
+        self._client = client
 
     def to_dict(self) -> dict: ...
 
     def to_dict(self):
-        return vars(self)
+        return {k:v for k, v in vars(self).items() 
+                if not k.startswith("_") and not callable(v)
+                }
 
     @classmethod
     def from_dict(cls, data:dict) -> "BaseModel": ...
