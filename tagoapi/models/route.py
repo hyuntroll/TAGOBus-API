@@ -38,9 +38,9 @@ class Route(BaseModel):
     @classmethod
     def from_dict(cls, data: dict) -> "Route":
         return cls(
-            routeId=data["routeid"],
-            routeNo=data["routeno"],
-            routeTp=data["routetp"],
+            routeId=data.get("routeid"),
+            routeNo=data.get("routeno"),
+            routeTp=data.get("routetp"),
             startNodeNm=data.get("startnodenm"),
             endNodeNm=data.get("endnodenm"),
             endvehicletime=data.get("endvehicletime"),
