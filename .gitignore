@@ -5,4 +5,3 @@ tests/__pycache__
 .env
 caches
 .vscodeoutput.json
-tests/
