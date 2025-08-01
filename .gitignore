@@ -5,3 +5,6 @@ tests/__pycache__
 .env
 caches
 .vscodeoutput.json
+
+
+tagoapi/models/
