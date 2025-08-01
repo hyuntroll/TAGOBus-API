@@ -6,6 +6,7 @@ from .convertor import convert
 from .parser import KeyExtract
 from .params import build_params
 from .http import http_get
+from .get_station import get_station
 
 
 
@@ -17,5 +18,6 @@ __all__ = [
     "convert",
     "build_params",
     "cache",
-    "http_get"
+    "http_get",
+    "get_station"
 ]
