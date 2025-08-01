@@ -10,5 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 api_key = os.getenv('TAGO_API_KEY')
 
-print(get_station("민들"))
+
+def test_statin():
+    assert (get_station("민들"), list)
 
