@@ -6,7 +6,8 @@ from .cache import Cache
 #     loaded_csv = pd.read_csv(csvfile, encoding=encoding)
 #     data = loaded_csv.to_dict(orient='records')
 #     return data
-
+cache = Cache("caches/station.pkl")
+station_list = cache.get("stations_2025_06_15.csv")
 
 def get_station(keyword) -> list[Station]:
     result = []
@@ -26,8 +27,7 @@ def get_station(keyword) -> list[Station]:
 
     return result
 
-cache = Cache("caches/station.pkl")
-station_list = cache.get("stations_2025_06_15.csv")
+
 # if not station_list:
 #     station_list = csv_to_dict("tagoapi/csv/stations_2025_06_15.csv", 'cp949')
 #     cache.save("stations_2025_06_15.csv", station_list)
