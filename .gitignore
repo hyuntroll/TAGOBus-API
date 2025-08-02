@@ -3,7 +3,7 @@ tagopi/__pycache__
 tests/__pycache__
 .pytest_cache
 .env
-caches
+caches/cache.pkl
 .vscodeoutput.json
 
 
