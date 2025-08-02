@@ -25,7 +25,7 @@ def get_station(keyword) -> list[Station]:
             )
     
 
-    return result
+    return station_list
 
 
 # if not station_list:
