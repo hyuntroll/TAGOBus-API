@@ -1,12 +1,15 @@
 import os, pickle
 from time import time
 
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_PATH = 'caches/cache.pkl' 
 
 class Cache:
     def __init__(self, path: str = CACHE_PATH):
+        self.path = os.path.join(MODULE_DIR, "....", path)
+        self.path = os.path.abspath(self.path)
         os.makedirs("caches", exist_ok=True)
-        self.path = path
+
         self._cache = self._load()
 
 
