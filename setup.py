@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="UnOffical_TAGO_API",
-    version="0.2",
+    version="0.3",
     description="test1",
     url="https://github.com/hyuntroll/TAGOBus-API",
     long_description=open('README.md', 'r').read(),
