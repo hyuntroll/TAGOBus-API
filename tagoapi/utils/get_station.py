@@ -29,7 +29,7 @@ def get_station(keyword) -> list[Station]:
             )
     
 
-    return station_list
+    return result
 
 
 # if not station_list:
