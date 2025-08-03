@@ -2,7 +2,7 @@ import os, pickle
 from time import time
 
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(MODULE_DIR, "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(MODULE_DIR, ".."))
 CACHE_DIR = os.path.join(PROJECT_ROOT, "caches")
 DEFAULT_CACHE_PATH = os.path.join(CACHE_DIR, "cache.pkl")
 

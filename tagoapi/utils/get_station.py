@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd, os
 from tagoapi.models import Station
 from .cache import Cache
 
@@ -6,7 +6,11 @@ from .cache import Cache
 #     loaded_csv = pd.read_csv(csvfile, encoding=encoding)
 #     data = loaded_csv.to_dict(orient='records')
 #     return data
-cache = Cache("caches/station.pkl")
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(MODULE_DIR, ".."))
+CACHE_DIR = os.path.join(PROJECT_ROOT, "caches")
+STATION_CACHE_PATH = os.path.join(CACHE_DIR, "station.pkl")
+cache = Cache(STATION_CACHE_PATH)
 station_list = cache.get("stations_2025_06_15.csv")
 
 def get_station(keyword) -> list[Station]:
