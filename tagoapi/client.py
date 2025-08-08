@@ -47,14 +47,14 @@ class TAGOClient:
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Route, is_list=False)
 
-    @from_cache_or_fetch()
+    @from_cache_or_fetch(604800)
     def get_route_by_station(
         self,
         cityCode: int,
         nodeId: str
     ) -> list[Route]:
-        endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
-        params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
+        endpoint = f'BusSttnInfoInqireService/getSttnThrghRouteList'
+        params = build_params(self.auth, cityCode=cityCode, nodeid=nodeId)
         return self._fetch_and_convert(endpoint, params, Route)
     
 
