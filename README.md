@@ -2,7 +2,8 @@
 [![Upload Python Package](https://github.com/hyuntroll/TAGOBus-API/actions/workflows/python-publish.yml/badge.svg)](https://github.com/hyuntroll/TAGOBus-API/actions/workflows/python-publish.yml)
 ![pypi version](https://img.shields.io/pypi/v/Unoffical-Tago-API) ![license](https://img.shields.io/github/license/hyuntroll/TAGOBus-API)
 
-TAGOAPI는 국가대중교통정보센터(TAGO)에서 제공하는 버스 api를 파이썬에서 사용할 수 있게 만든 비공식 API입니다.
+**TAGOBus-API**는 국가대중교통정보센터(TAGO)에서 제공하는 **버스 정보 API**를 Python에서 쉽게 사용할 수 있도록 만든 **비공식 Python 라이브러리**입니다.
+
 
 
 ## 설치
@@ -13,8 +14,9 @@ TAGOAPI는 국가대중교통정보센터(TAGO)에서 제공하는 버스 api를
 pip install Unoffical-TAGO-API
 ```
 
-## 사용 전 알아야 하는 사항
+## 사용 전 준비사항
 
+본 API를 사용하기 위해서는 **공공데이터포털**에서 TAGO 버스 관련 데이터를 활용 신청해야 합니다.
 
 [국토교통부_(TAGO)_버스정류소정보](https://www.data.go.kr/data/15098534/openapi.do)
 
@@ -24,97 +26,89 @@ pip install Unoffical-TAGO-API
 
 [국토교통부_(TAGO)_버스위치정보](https://www.data.go.kr/data/15098533/openapi.do)
 
-에서 모두 데이터 활용 신청을 해야 합니다. (활용 신청을 하지 않으면 서비스를 이용하실 수 없습니다.)
+**서비스 키**는 [공공데이터포털 마이페이지](https://www.data.go.kr/iim/main/mypageMain.do)에서 **Decoding 키**를 사용하세요.
 
-서비스 키는 [공공 데이터 포털 마이 페이지](https://www.data.go.kr/iim/main/mypageMain.do) 에서 확인하실 수 있고, Decoding키를 사용합니다.
+
+## 주요 매개변수
+
+| 매개변수  | 설명 |
+|-----------|------|
+| `cityCode` | 도시 코드 |
+| `routeNo`  | 버스 노선 번호 |
+| `routeId`  | 버스 노선 ID |
+| `nodeId`   | 정류소 ID |
+| `nodeNm`   | 정류소 이름 |
+| `nodeNo`   | 정류소 번호 |
+| `gpsLati`  | 위도(WGS84) |
+| `gpsLong`  | 경도(WGS84) |
 
 ---
 
-주로 사용하는 변수/매개변수 이름 입니다:
-- `cityCode`: 도시코드
-- `routeNo`: 노선 번호
-- `routeId`: 노선 ID
-- `nodeId`: 정류소 ID
-- `nodeNm`: 정류소명
-- `nodeNo`: 정류소번호
-- `gpsLati`: WGS84 위도 좌표
-- `gpsLong`: WGS84 경도 좌표
-
 ## 사용 법
 
-### 1. Client 생성
-
-TAGOClient를 통해 클라이언트를 만들 수 있습니다.
+### 1. 클라이언트 생성
 
 ```python
-from tagoapi import TAGOClient
-from tagoapi import TAGOAuth
+from tagoapi import TAGOClient, TAGOAuth
 
-client = TAGClient(auth=TAGOAuth(YOUR_SERVICE_KEY))
-
+client = TAGOClient(auth=TAGOAuth("YOUR_SERVICE_KEY"))
 ```
+---
 
-### 2. 정류장 찾기_로컬
-
-client를 사용하지 않고 정류장을 찾는 함수 입니다.
+### 2. 정류장 검색 (로컬 함수)
+클라이언트를 사용하지 않고도 **지역 기반 정류장 검색**이 가능합니다.
 
 ```python
 from tagoapi import get_station
 
-print( get_station("대구") )
-
+stations = get_station("대구")
+print(stations)
 ```
+
+---
 
 ### 3. 도메인 클래스
 
-모든 메서드와 get_station함수는 리턴 값으로 `Station`, `Vehicle`, `Route`, `ArrivalInfo` 도메인 클래스를 가집니다.
+모든 메서드와 `get_station` 함수는 다음과 같은 **도메인 객체**를 반환합니다.
 
-도메인 클래스는 공통적으로 
+- `Station` : 정류소 정보  
+- `Vehicle` : 버스 차량 정보  
+- `Route` : 버스 노선 정보  
+- `ArrivalInfo` : 버스 도착 정보
 
-```python
-def to_dict(self): # 도메인 객체를 딕셔너리로 변환합니다. 
+#### 공통 메서드
+~~~python
+obj.to_dict()             # 객체 → dict 변환
+ClassName.from_dict(dict) # dict → 객체 변환
+ClassName.from_list(list) # dict 리스트 → 객체 리스트 변환
+~~~
 
-@classmethod
-def from_dict(cls, data:dict):  # 딕셔너리를 도메인 객체로 변환합니다.
+---
 
-@classmethod
-def from_list(cls, data:list): # 딕셔너리를 요소로 가진 리스트를 도메인 객체로 변환합니다.
-```
+### 도메인 객체 필드 목록
 
-메서드를 가지고 있습니다.
-
-#### 3-1. Station
-정류장 정보를 가지는 도메인 클래스 입니다.
-
-#### 3-2. Vehicle
-노선의 차량 정보를 가지는 도메인 클래스 입니다.
-
-#### 3-3. Route
-노선 정보를 가지는 도메인 클래스 입니다.
-
-#### 3-4. ArrivalInfo
-노선의 도착 정보를 가지는 도메인 클래스 입니다.
+#### **Station**
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| `cityCode` | `str` | 도시 코드 |
+| `nodeId` | `str` | 정류소 ID |
+| `nodeNm` | `str` | 정류소명 |
+| `nodeNo` | `int` | 정류소 번호 |
+| `gpsLati` | `float` | 위도 (WGS84) |
+| `gpsLong` | `float` | 경도 (WGS84) |
 
 
-### 4. API 사용 
+## 지원 API 목록
 
-`get_route_by_no`: 버스 노선번호 목록을 조회
+| 메서드 | 설명 | 매개변수 |
+|--------|------|----------|
+| `get_route_by_no` | 버스 노선 번호로 조회 | `cityCode`, `routeNo` |
+| `get_route_by_id` | 노선 ID로 정보 조회 | `cityCode`, `routeId` |
+| `get_route_by_station` | 정류소 경유 노선 조회 | `cityCode`, `nodeId` |
+| `get_station_by_route` | 노선 경유 정류소 조회 | `cityCode`, `routeId` |
+| `get_station` | 정류소명 또는 번호로 조회 | `cityCode`, `nodeNm` (선택: `nodeNo`) |
+| `get_station_by_gps` | GPS 좌표 기반 주변 정류소 조회 | `gpsLati`, `gpsLong` |
 
-- 매개변수: `cityCode`, `routeNo`
-
-`get_route_by_id`: 노선의 기본 정보를 조회
-- 매개변수: `cityCode`, `routeId`
-
-`get_route_by_station`: 정류소의 경유노선 목록을 조회
-- 매개변수: `cityCode`, `nodeId`
-
-`get_station_by_route`: 노선이 경유하는 정류소의 목록을 조회
-- 매개변수: `cityCode`, `routeId`
-
-`get_station`: 정류소명과 정류소 고유번호를 이용하여 정류소의 정보를 검색
-- 매개변수_1: `cityCode`, `nodeNo`
-- 매개변수_2: `cityCode`, `nodeNo[Optical]`, `nodeNm`
-
-`get_station_by_gps`: GPS좌표를 기반으로 근처(반경 500m)에 있는 정류장을 검색
-- 매개변수: `gpsLati`, `gpsLong`
-### 5. 오류 
+---
+### 5. 오류 및 이슈
+버그 제보 또는 기능 요청은 [GitHub 이슈](https://github.com/hyuntroll/TAGOBus-API/issues)에 등록해주세요.
