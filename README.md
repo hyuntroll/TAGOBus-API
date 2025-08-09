@@ -15,7 +15,6 @@ pip install Unoffical-TAGO-API
 
 ## 사용 전 알아야 하는 사항
 
-사용 전 
 
 [국토교통부_(TAGO)_버스정류소정보](https://www.data.go.kr/data/15098534/openapi.do)
 
