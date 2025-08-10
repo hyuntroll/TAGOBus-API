@@ -90,12 +90,50 @@ ClassName.from_list(list) # dict 리스트 → 객체 리스트 변환
 #### **Station**
 | 필드명 | 타입 | 설명 |
 |--------|------|------|
-| `cityCode` | `str` | 도시 코드 |
 | `nodeId` | `str` | 정류소 ID |
 | `nodeNm` | `str` | 정류소명 |
 | `nodeNo` | `int` | 정류소 번호 |
 | `gpsLati` | `float` | 위도 (WGS84) |
 | `gpsLong` | `float` | 경도 (WGS84) |
+| `cityCode` | `int` | 도시코드 |
+| `updowncd` | `int` | 상하행구분코드 (`0`: 상행, `1`: 하행) |
+| `nodeord` | `int` | 정류소순번 |
+
+#### **Route**
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| `routeId` | `str` | 노선 ID |
+| `routeNo` | `str` | 노선명 |
+| `routeTp` | `int` | 노선유형 |
+| `endNodeNm` | `str` | 종점 |
+| `startNodeNm` | `str` | 기점 |
+| `endvehicletime` | `int` | 막차시간 |
+| `startvehicletime` | `int` | 첫차시간 |
+
+#### **ArrivalInfo**
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| `nodeId` | `str` | 정류소 ID |
+| `nodeNm` | `str` | 정류소명 |
+| `routeId` | `str` | 노선 ID |
+| `routeNo` | `str` | 노선명 |
+| `routeTp` | `int` | 노선유형 |
+| `arrprevstationcnt` | `int` | 노선유형 |
+| `vehicletp` | `str` | 차랑유형 |
+| `arrtime` | `int` | 도착예상시간 |
+
+#### **Vehicle**
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| `routeId` | `str` | 노선 ID |
+| `routeNo` | `str` | 노선명 |
+| `gpsLati` | `float` | 위도 (WGS84) |
+| `gpsLong` | `float` | 경도 (WGS84) |
+| `arrtime` | `int` | 도착예상시간 |
+| `arrprevstationcnt` | `int` | 노선유형 |
+| `vehicleTp` | `str` | 차랑유형 |
+| `vehicleNo` | `str` | 차랑번호 |
+
 
 
 ## 지원 API 목록
@@ -108,6 +146,10 @@ ClassName.from_list(list) # dict 리스트 → 객체 리스트 변환
 | `get_station_by_route` | 노선 경유 정류소 조회 | `cityCode`, `routeId` |
 | `get_station` | 정류소명 또는 번호로 조회 | `cityCode`, `nodeNm` (선택: `nodeNo`) |
 | `get_station_by_gps` | GPS 좌표 기반 주변 정류소 조회 | `gpsLati`, `gpsLong` |
+| `get_arrival_by_station` | 실시간 도착예정정보 및 운행정보 목록을 조회 | `cityCode`, `nodeId` |
+| `get_route_arrival_by_station` | 특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회 | `cityCode`, `nodeId`, `routeId` |
+| `get_route_pos` | 버스의 GPS위치정보의 목록을 조회 | `cityCode`, `routeId` |
+| `get_route_pos_near_station` | 특정정류소에 접근한 버스의 GPS위치정보를 조회 | `cityCode`, `routeId`, `nodeId` |
 
 ---
 ### 5. 오류 및 이슈

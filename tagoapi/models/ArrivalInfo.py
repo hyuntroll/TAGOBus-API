@@ -3,22 +3,22 @@ from .BaseModel import BaseModel
 
 class ArrivalInfo(BaseModel):
     def __init__(self,
-        nodeid,
-        nodenm,
+        nodeId,
+        nodeNm,
         routeId: str,
         routeNo: str,
-        routetp,
+        routeTp,
         arrprevstationcnt: int = None,
-        vehicletp: str = None,
+        vehicleTp: str = None,
         arrtime: int = None
     ):
-        self.nodeid = nodeid
-        self.nodenm = nodenm
+        self.nodeId = nodeId
+        self.nodeNm = nodeNm
         self.routeId = routeId
         self.routeNo = routeNo
-        self.routetp = routetp
+        self.routeTp = routeTp
         self.arrprevstationcnt = arrprevstationcnt
-        self.vehicletp = vehicletp
+        self.vehicleTp = vehicleTp
         self.arrtime = arrtime
     
     def __repr__(self):
@@ -30,13 +30,13 @@ class ArrivalInfo(BaseModel):
     @classmethod
     def from_dict(cls, data: dict) -> "ArrivalInfo":
         return cls(
-            nodeid=data.get("nodeid"),
-            nodenm=data.get("nodeid"),
-            routetp=data.get("routetp"),
+            nodeId=data.get("nodeid"),
+            nodeNm=data.get("nodeid"),
+            routeTp=data.get("routetp"),
             routeId = data.get("routeid"),
             routeNo = data.get("routeno"),
             arrprevstationcnt = data.get("arrprevstationcnt"),
-            vehicletp = data.get("vehicletp"),
+            vehicleTp = data.get("vehicletp"),
             arrtime = data.get("arrtime")
         )
     
