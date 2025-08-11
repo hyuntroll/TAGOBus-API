@@ -18,6 +18,9 @@ class RequestExcessdsError(TAGOAPIError):
 class NoOpenAPIServiceError(TAGOAPIError):
     """오픈 API 서비스가 없거나 페기됨"""
     pass
+class CacheNotFoundError(TAGOAPIError):
+    """캐시파일을 불러오지 못할 때"""
+    pass
 
 class TAGORequestError(TAGOAPIError):
     """요청 실패 (http 에러, 타임아웃 등)"""
