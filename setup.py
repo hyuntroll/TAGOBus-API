@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="UnOffical_TAGO_API",
-    version="0.10",
+    version="0.11",
     description="Unofficial Python wrapper for TAGO Bus API",
     url="https://github.com/hyuntroll/TAGOBus-API",
     long_description=open('README.md', 'r', encoding='utf-8').read(),
