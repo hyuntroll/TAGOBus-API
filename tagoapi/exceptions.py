@@ -15,6 +15,17 @@ class RequestExcessdsError(TAGOAPIError):
     """서비스 요청제한횟수 초과 에러"""
     pass
 
+class DeadLineHasExpired(TAGOAPIError):
+    """활용기간 만료"""
+    pass
+
+class UnRegisteredIpError(TAGOAPIError):
+    """등록되지 않은 IP"""
+    pass
+
+class ServiceAccessDeniedError(TAGOAPIError):
+    """서비스 접근 거부"""
+
 class NoOpenAPIServiceError(TAGOAPIError):
     """오픈 API 서비스가 없거나 페기됨"""
     pass

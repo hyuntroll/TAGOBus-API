@@ -186,8 +186,17 @@ class TAGOClient:
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)
         error_code = response.get("returnReasonCode")
+    
+        if error_code == '20':
+            raise ServiceAccessDeniedError("서비스에 접근이 거부되었습니다.")
+        elif error_code == '22':
+            raise RequestExcessdsError("서비스 요청제한횟수를 초과했습니다.")
         if error_code == '30':
             raise ServiceKeyNotRegisteredError("유효하지 않는 서비스키 입니다.")
+        elif error_code == '31':
+            raise DeadLineHasExpired("API활용기간이 만료되었습니다.")
+        elif error_code == '32':
+            raise UnRegisteredIpError("등록되지 않은 IP입니다.")
         elif error_code:
             raise RuntimeError(f"실행중 오류가 발생했습니다. 에러코드: {error_code}")
 
