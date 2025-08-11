@@ -33,6 +33,7 @@ class TAGOClient:
         cityCode: int,
         routeNo: str
     ) -> list[Route]:
+        """노선 번호로 버스를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
         return self._fetch_and_convert(endpoint, params, Route)
@@ -43,6 +44,7 @@ class TAGOClient:
         cityCode: int,
         routeId: str
     ) -> Route:
+        """노선 ID로 버스 정보를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Route, is_list=False)
@@ -53,7 +55,8 @@ class TAGOClient:
         cityCode: int,
         nodeId: str
     ) -> list[Route]:
-        endpoint = f'BusSttnInfoInqireService/getSttnThrghRouteList'
+        """정류소를 경유하는 노선을 조회합니다"""
+        endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
         params = build_params(self.auth, cityCode=cityCode, nodeid=nodeId)
         return self._fetch_and_convert(endpoint, params, Route)
     
@@ -64,6 +67,7 @@ class TAGOClient:
         cityCode: int,
         routeId: str
     ) -> list[Station]:
+        """노선이 경유하는 정류소를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Station)
@@ -75,6 +79,7 @@ class TAGOClient:
         nodeNo: int = None,
         nodeNm: str = None,
     ) -> list[Station]:
+        """정류소명 또는 번호로 정류소를 조회합니다"""
         if not (nodeNo or nodeNm):
             raise ValueError("Only one of 'nodeNo' or 'nodeNm' should be provided.")
 
@@ -88,6 +93,7 @@ class TAGOClient:
         gpsLati: float,
         gpsLong: float
     ) -> list[Station]:
+        """GPS 좌표 기반으로 주변 정류소를 조회합니다"""
         endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
         params = build_params(self.auth, gpsLati=gpsLati, gpsLong=gpsLong)
         return self._fetch_and_convert(endpoint, params, Station)
@@ -98,6 +104,7 @@ class TAGOClient:
         cityCode: int,
         nodeId: str,
     ) -> list[ArrivalInfo]:
+        """실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
         return self._fetch_and_convert(endpoint, params, ArrivalInfo)
@@ -108,6 +115,7 @@ class TAGOClient:
         nodeId: str,
         routeId: str,
     ) -> list[ArrivalInfo]:
+        """특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, ArrivalInfo)
@@ -118,6 +126,7 @@ class TAGOClient:
         cityCode: int,
         routeId: int,
     ) -> list[Vehicle]:
+        """버스의 S위치정보의 목록을 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Vehicle, is_cache=False)
@@ -128,6 +137,7 @@ class TAGOClient:
         routeId: int,
         nodeId: int,
     ) -> list[Vehicle]:
+        """특정정류소에 접근한 버스의 위치정보를 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
         return self._fetch_and_convert(endpoint, params, Vehicle)
