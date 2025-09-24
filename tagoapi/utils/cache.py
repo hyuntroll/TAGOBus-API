@@ -14,8 +14,13 @@ class Cache:
 
     def _load(self) -> dict:
         if os.path.exists(self.path):
-            with open(self.path, 'rb') as f:
-                return pickle.load(f)
+            try:
+                
+                with open(self.path, 'rb') as f:
+                    return pickle.load(f)
+                
+            except Exception:
+                return {}
         return {}
 
     def save(self, key: str, value: dict, ttl: int = 86400) -> bool:

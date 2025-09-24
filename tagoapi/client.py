@@ -156,9 +156,13 @@ class TAGOClient:
         response = parse_metadata(self._get(endpoint, params))
         if not response: 
             return None 
+        
+        ## Convert to List
         if isinstance(response, list):
+
             if not is_cache:
-                return convert(response, model.from_list)
+                return convert(response, model.from_list, self)
+            
             result = []
             for v in response:
                 key = cache_key.generate_key(v)
@@ -171,8 +175,10 @@ class TAGOClient:
                     cache.save(key, parsed_obj, self.CACHE_TTL)
 
             return result
-
+        
+        ## Covert to Dict
         else:
+            
             if is_cache: 
                 key = cache_key.generate_key(response)
                 cached = cache.get(key)

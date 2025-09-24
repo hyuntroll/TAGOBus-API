@@ -18,6 +18,7 @@ if not station_list:
     cache.save("stations_2025_06_15.csv", station_list)
 
 def get_station(keyword) -> list[Station]:
+    print(cache.current_cache)
     result = []
     try:
         for station in station_list:
