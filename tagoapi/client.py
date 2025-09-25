@@ -155,44 +155,32 @@ class TAGOClient:
         cache_key = KeyExtract(model)
         response = parse_metadata(self._get(endpoint, params))
         if not response: 
-            return None 
+            return None
         
         ## Convert to List
         if isinstance(response, list):
+            for res in response:
+                key = cache_key.generate_key(res)
+                cache.save(key, res, self.CACHE_TTL)
+                
+            return convert(response, model.from_list, self)
 
-            if not is_cache:
-                return convert(response, model.from_list, self)
-            
-            result = []
-            for v in response:
-                key = cache_key.generate_key(v)
-                cached = cache.get(key)
-                if cached:
-                    result.append(cached)
-                else:
-                    parsed_obj = convert(v, model.from_dict)
-                    result.append(parsed_obj)
-                    cache.save(key, parsed_obj, self.CACHE_TTL)
+        ## Convert to Dict
+        key = cache_key.generate_key(response)
+        cache.save(key, response, self.CACHE_TTL)
 
-            return result
-        
-        ## Covert to Dict
-        else:
-            
-            if is_cache: 
-                key = cache_key.generate_key(response)
-                cached = cache.get(key)
-                if cached:
-                    return [cached] if is_list else cached
-            result = convert(response, model.from_dict)
-            cache.save(key, result, self.CACHE_TTL)
-            return [result] if is_list else result
+        result = convert(response, model.from_dict, self)
+        return [result] if is_list else result
 
     
+
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)
         error_code = response.get("returnReasonCode")
-    
+
+        if not error_code:
+            return response
+        
         if error_code == '20':
             raise ServiceAccessDeniedError("서비스에 접근이 거부되었습니다.")
         elif error_code == '22':
@@ -205,5 +193,3 @@ class TAGOClient:
             raise UnRegisteredIpError("등록되지 않은 IP입니다.")
         elif error_code:
             raise RuntimeError(f"실행중 오류가 발생했습니다. 에러코드: {error_code}")
-
-        return response

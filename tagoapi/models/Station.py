@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from .BaseModel import BaseModel
 if TYPE_CHECKING:
     from .Route import Route
+    from tagoapi import TAGOClient
 
 class Station(BaseModel):
     # cache_key = "Station:<nodeId><nodenm>"
@@ -16,9 +17,11 @@ class Station(BaseModel):
         gpsLong: float = None,
         cityCode: int = None,
         updowncd: int = None,
-        nodeord: int = None
+        nodeord: int = None,
+        client: "TAGOClient" = None
         # *routeList: list['Route']
     ):
+        super().__init__(client)
         self.nodeId = nodeId
         self.nodeNm = nodeNm
         self.nodeNo = nodeNo
@@ -36,7 +39,7 @@ class Station(BaseModel):
         return vars(self)
     
     @classmethod
-    def from_dict(cls, data: dict) -> "Station":
+    def from_dict(cls, data: dict, client: "TAGOClient") -> "Station":
         return cls(
             nodeId = data.get("nodeid"),
             nodeNm = data.get("nodenm"),
@@ -45,10 +48,11 @@ class Station(BaseModel):
             gpsLong = float(data.get("gpslong")),
             cityCode = data.get("citycode"),
             updowncd = data.get("updowncd"),
-            nodeord = data.get("nodeord")
+            nodeord = data.get("nodeord"),
+            client = client
         )
     
     @classmethod
-    def from_list(cls, data: list[dict]) -> list["Station"]:
-        return [cls.from_dict(station) for station in data]
+    def from_list(cls, data: list[dict], client: "TAGOClient") -> list["Station"]:
+        return [cls.from_dict(station, client) for station in data]
     

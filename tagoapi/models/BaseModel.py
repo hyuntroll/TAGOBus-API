@@ -4,7 +4,7 @@ if TYPE_CHECKING:
 
 class BaseModel:
     cache_key = "BaseModel:<id>"
-    def __init__(self, client: TAGOClient):
+    def __init__(self, client: "TAGOClient"):
         self._client = client
           
     def to_dict(self) -> dict: ...
@@ -13,10 +13,10 @@ class BaseModel:
         return vars(self)
 
     @classmethod
-    def from_dict(cls, data: dict, client: TAGOClient) -> "BaseModel": ...
+    def from_dict(cls, data: dict, client: "TAGOClient") -> "BaseModel": ...
 
     @classmethod
-    def from_list(cls, data: list, client: TAGOClient) -> list["BaseModel"]:
+    def from_list(cls, data: list, client: "TAGOClient") -> list["BaseModel"]:
         return [cls.from_dict(v, client) for v in data]
     
 

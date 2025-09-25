@@ -11,6 +11,7 @@ MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(MODULE_DIR, ".."))
 CACHE_DIR = os.path.join(PROJECT_ROOT, "caches")
 STATION_CACHE_PATH = os.path.join(CACHE_DIR, "station.pkl")
+
 cache = Cache(STATION_CACHE_PATH)
 station_list = cache.get("stations_2025_06_15.csv")
 if not station_list:
@@ -18,7 +19,7 @@ if not station_list:
     cache.save("stations_2025_06_15.csv", station_list)
 
 def get_station(keyword) -> list[Station]:
-    print(cache.current_cache)
+    # print(cache.current_cache)
     result = []
     try:
         for station in station_list:
