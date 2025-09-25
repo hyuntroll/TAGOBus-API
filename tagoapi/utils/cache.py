@@ -6,6 +6,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(MODULE_DIR, ".."))
 CACHE_DIR = os.path.join(PROJECT_ROOT, "caches")
 DEFAULT_CACHE_PATH = os.path.join(CACHE_DIR, "cache.pkl")
 
+
 class Cache:
     def __init__(self, path: str = DEFAULT_CACHE_PATH):
         self.path = os.path.abspath(path)
@@ -19,7 +20,8 @@ class Cache:
                 with open(self.path, 'rb') as f:
                     return pickle.load(f)
                 
-            except Exception:
+            except Exception as e:
+                # print(e)
                 return {}
         return {}
 

@@ -72,7 +72,7 @@ class TAGOClient:
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Station)
     
-    @from_cache_or_fetch(86400)
+    # @from_cache_or_fetch(86400)
     def get_station(
         self,
         cityCode: int,
