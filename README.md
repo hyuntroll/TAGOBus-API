@@ -79,8 +79,8 @@ print(stations)
 #### 공통 메서드
 ~~~python
 obj.to_dict()             # 객체 → dict 변환
-ClassName.from_dict(dict) # dict → 객체 변환
-ClassName.from_list(list) # dict 리스트 → 객체 리스트 변환
+BaseModel.from_dict(dict) # dict → 객체 변환
+BaseModel.from_list(list) # dict 리스트 → 객체 리스트 변환
 ~~~
 
 ---
