@@ -6,6 +6,7 @@ from requests.exceptions import (
 
 
 def http_get(endpoint: str, params: dict) -> dict:
+    response = None
     try:
         response = requests.get(endpoint, params=params, timeout=(3, 10))
         response.raise_for_status()
