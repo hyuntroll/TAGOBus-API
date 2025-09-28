@@ -11,3 +11,5 @@ class BaseList(list): # list 상속 받아도 좋을듯
     def set_client(self, client: "TAGOClient"):
         for element in self:
             element.set_client(client)
+
+        return self

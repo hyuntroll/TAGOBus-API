@@ -38,7 +38,7 @@ class Station(BaseModel):
         return vars(self)
     
     @classmethod
-    def from_dict(cls, data: dict, client: "TAGOClient") -> "Station":
+    def from_dict(cls, data: dict) -> "Station":
         return cls(
             nodeId = data.get("nodeid"),
             nodeNm = data.get("nodenm"),
@@ -50,7 +50,7 @@ class Station(BaseModel):
             nodeord = data.get("nodeord"),
         )
     
-    @classmethod
-    def from_list(cls, data: list[dict], client: "TAGOClient") -> list["Station"]:
-        return [cls.from_dict(station, client) for station in data]
+    # @classmethod
+    # def from_list(cls, data: list[dict]) -> list["Station"]:
+    #     return [cls.from_dict(station, client) for station in data]
     
