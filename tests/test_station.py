@@ -1,4 +1,4 @@
-from tagoapi import *
+from tagoapi import TAGOClient, TAGOAuth, cache
 import os
 from dotenv import load_dotenv
 

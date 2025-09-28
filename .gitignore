@@ -5,6 +5,7 @@ tests/__pycache__
 .env
 caches/cache.pkl
 .vscodeoutput.json
+.tagoapi
 
 
 tagoapi/caches/station.pkl

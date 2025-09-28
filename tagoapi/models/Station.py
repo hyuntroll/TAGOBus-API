@@ -18,10 +18,9 @@ class Station(BaseModel):
         cityCode: int = None,
         updowncd: int = None,
         nodeord: int = None,
-        client: "TAGOClient" = None
         # *routeList: list['Route']
     ):
-        super().__init__(client)
+        super().__init__()
         self.nodeId = nodeId
         self.nodeNm = nodeNm
         self.nodeNo = nodeNo
@@ -49,7 +48,6 @@ class Station(BaseModel):
             cityCode = data.get("citycode"),
             updowncd = data.get("updowncd"),
             nodeord = data.get("nodeord"),
-            client = client
         )
     
     @classmethod

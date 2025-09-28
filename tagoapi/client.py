@@ -72,12 +72,15 @@ class TAGOClient:
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Station)
     
-    # @from_cache_or_fetch(86400)
+    @from_cache_or_fetch(86400)
     def get_station(
         self,
         cityCode: int,
         nodeNo: int = None,
         nodeNm: str = None,
+        _is_cache: bool = True,
+        _model: BaseModel = Station,
+        _is_list: bool = True
     ) -> list[Station]:
         """정류소명 또는 번호로 정류소를 조회합니다"""
         if not (nodeNo or nodeNm):
@@ -85,7 +88,7 @@ class TAGOClient:
 
         endpoint = f'{self.BUSTATION}/getSttnNoList'
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
-        return self._fetch_and_convert(endpoint, params, Station)
+        return self._fetch_and_convert(endpoint, params)
     
     @from_cache_or_fetch(86400)
     def get_station_by_gps(
@@ -142,36 +145,17 @@ class TAGOClient:
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
         return self._fetch_and_convert(endpoint, params, Vehicle)
 
-
-
     def _fetch_and_convert(
-            self, 
-            endpoint: str, 
-            params: dict, 
-            model: BaseModel,
-            is_list: bool = True,
-            is_cache: bool = True
-    ) -> BaseModel:
-        cache_key = KeyExtract(model)
+            self,
+            endpoint: str,
+            params: dict,
+    ) -> list | dict:
         response = parse_metadata(self._get(endpoint, params))
-        if not response: 
-            return None
-        
-        ## Convert to List
-        if isinstance(response, list):
-            for res in response:
-                key = cache_key.generate_key(res)
-                cache.save(key, res, self.CACHE_TTL)
-                
-            return convert(response, model.from_list, self)
+        return response
 
-        ## Convert to Dict
-        key = cache_key.generate_key(response)
-        cache.save(key, response, self.CACHE_TTL)
 
-        result = convert(response, model.from_dict, self)
-        return [result] if is_list else result
 
+    #############################
     
 
     def _get(self, endpoint: str, params: dict) -> any:
@@ -185,11 +169,11 @@ class TAGOClient:
             raise ServiceAccessDeniedError("서비스에 접근이 거부되었습니다.")
         elif error_code == '22':
             raise RequestExcessdsError("서비스 요청제한횟수를 초과했습니다.")
-        if error_code == '30':
+        elif error_code == '30':
             raise ServiceKeyNotRegisteredError("유효하지 않는 서비스키 입니다.")
         elif error_code == '31':
             raise DeadLineHasExpired("API활용기간이 만료되었습니다.")
         elif error_code == '32':
             raise UnRegisteredIpError("등록되지 않은 IP입니다.")
-        elif error_code:
+        else:
             raise RuntimeError(f"실행중 오류가 발생했습니다. 에러코드: {error_code}")

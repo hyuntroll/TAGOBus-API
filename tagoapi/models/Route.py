@@ -18,10 +18,9 @@ class Route(BaseModel):
         startNodeNm: str = None,
         endvehicletime: int = None,
         startvehicletime: int = None,
-        client = None
         #TODO: 정류장 리스트도 넣으면 좋을 듯 합니당
     ):
-        super().__init__(client)
+        super().__init__()
         
         self.routeId = routeId
         self.routeNo = routeNo
