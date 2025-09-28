@@ -27,7 +27,7 @@ class TAGOClient:
     @overload
     def get_station(self, cityCode: int, nodeNo: Optional[int], nodeNm: str) -> list[Station]: ...
 
-    @from_cache_or_fetch(604800)
+    @covert_model(604800)
     def get_route_by_no(
         self,
         cityCode: int,
@@ -38,7 +38,7 @@ class TAGOClient:
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
         return self._fetch_and_convert(endpoint, params, Route)
         
-    @from_cache_or_fetch(604800)
+    @covert_model(604800)
     def get_route_by_id(
         self,
         cityCode: int,
@@ -49,7 +49,7 @@ class TAGOClient:
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Route, is_list=False)
 
-    @from_cache_or_fetch(604800)
+    @covert_model(604800)
     def get_route_by_station(
         self,
         cityCode: int,
@@ -61,7 +61,7 @@ class TAGOClient:
         return self._fetch_and_convert(endpoint, params, Route)
     
 
-    @from_cache_or_fetch(604800)
+    @covert_model(604800)
     def get_station_by_route(
         self,
         cityCode: int,
@@ -72,15 +72,13 @@ class TAGOClient:
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
         return self._fetch_and_convert(endpoint, params, Station)
     
-    @from_cache_or_fetch(86400)
+    @covert_model(86400, Station)
     def get_station(
         self,
         cityCode: int,
         nodeNo: int = None,
         nodeNm: str = None,
-        _is_cache: bool = True,
-        _model: BaseModel = Station,
-        _is_list: bool = True
+        _is_cache: bool = True
     ) -> list[Station]:
         """정류소명 또는 번호로 정류소를 조회합니다"""
         if not (nodeNo or nodeNm):
@@ -90,7 +88,7 @@ class TAGOClient:
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
         return self._fetch_and_convert(endpoint, params)
     
-    @from_cache_or_fetch(86400)
+    @covert_model(86400)
     def get_station_by_gps(
         self,
         gpsLati: float,
