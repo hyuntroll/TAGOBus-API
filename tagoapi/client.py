@@ -78,7 +78,7 @@ class TAGOClient:
         cityCode: int,
         nodeNo: int = None,
         nodeNm: str = None,
-        _is_cache: bool = True
+        _is_cached: bool = True
     ) -> list[Station]:
         """정류소명 또는 번호로 정류소를 조회합니다"""
         if not (nodeNo or nodeNm):

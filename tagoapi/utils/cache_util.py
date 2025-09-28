@@ -28,12 +28,12 @@ def covert_model(ttl: int = 86400, model: type["BaseModel"] = None, is_list: boo
             if model:
                 ## convert list
                 if isinstance(raw, list):
-                    res = model.from_list(cached)
+                    res = model.from_list(raw)
                 else:
-                    res = model.from_dict(cached)
+                    res = model.from_dict(raw)
+                # print(is_list and not isinstance(res, BaseList))
                 res.set_client(self)
-
-                return res if is_list and not isinstance(res, BaseList) else BaseList(res)
+                return BaseList([res]) if is_list and not isinstance(res, BaseList) else res
 
 
             return raw
