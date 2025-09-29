@@ -73,6 +73,7 @@ class TestTagoClient(unittest.TestCase):
         route = self.client.get_route_by_id(cityCode=25, routeId="DGB573493541")
 
         print(route._client)
+        print(cache.current_cache)
 
 
 if __name__ == "__main__":
