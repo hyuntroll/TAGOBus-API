@@ -44,6 +44,6 @@ class Vehicle(BaseModel):
             vehicleNo=data.get("vehicleno")
         )
     
-    @classmethod
-    def from_list(cls, data: list[dict]) -> list["Vehicle"]:
-        return [ cls.from_dict(vehicle) for vehicle in data]
+    # @classmethod
+    # def from_list(cls, data: list[dict]) -> list["Vehicle"]:
+    #     return [ cls.from_dict(vehicle) for vehicle in data]

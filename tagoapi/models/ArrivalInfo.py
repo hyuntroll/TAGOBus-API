@@ -40,6 +40,6 @@ class ArrivalInfo(BaseModel):
             arrtime = data.get("arrtime")
         )
     
-    @classmethod
-    def from_list(cls, data: list[dict]) -> list["ArrivalInfo"]:
-        return [cls.from_dict(station) for station in data]
+    # @classmethod
+    # def from_list(cls, data: list[dict]) -> list["ArrivalInfo"]:
+    #     return [cls.from_dict(station) for station in data]

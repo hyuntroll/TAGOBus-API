@@ -48,6 +48,6 @@ class Route(BaseModel):
             startvehicletime=data.get("startvehicletime")
         )
     
-    @classmethod
-    def from_list(cls, data: list[dict]) -> list["Route"]:
-        return [ cls.from_dict(route) for route in data ]
+    # @classmethod
+    # def from_list(cls, data: list[dict]) -> list["Route"]:
+    #     return [ cls.from_dict(route) for route in data ]

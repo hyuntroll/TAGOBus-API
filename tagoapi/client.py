@@ -27,7 +27,7 @@ class TAGOClient:
     @overload
     def get_station(self, cityCode: int, nodeNo: Optional[int], nodeNm: str) -> list[Station]: ...
 
-    @covert_model(604800)
+    @convert_model(604800, Route)
     def get_route_by_no(
         self,
         cityCode: int,
@@ -36,9 +36,9 @@ class TAGOClient:
         """노선 번호로 버스를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
-        return self._fetch_and_convert(endpoint, params, Route)
+        return self._fetch_and_convert(endpoint, params)
         
-    @covert_model(604800)
+    @convert_model(604800, Route, is_list=False)
     def get_route_by_id(
         self,
         cityCode: int,
@@ -47,9 +47,9 @@ class TAGOClient:
         """노선 ID로 버스 정보를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Route, is_list=False)
+        return self._fetch_and_convert(endpoint, params)
 
-    @covert_model(604800)
+    @convert_model(604800, Route)
     def get_route_by_station(
         self,
         cityCode: int,
@@ -58,10 +58,10 @@ class TAGOClient:
         """정류소를 경유하는 노선을 조회합니다"""
         endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
         params = build_params(self.auth, cityCode=cityCode, nodeid=nodeId)
-        return self._fetch_and_convert(endpoint, params, Route)
+        return self._fetch_and_convert(endpoint, params)
     
 
-    @covert_model(604800)
+    @convert_model(604800, Station)
     def get_station_by_route(
         self,
         cityCode: int,
@@ -70,9 +70,9 @@ class TAGOClient:
         """노선이 경유하는 정류소를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Station)
+        return self._fetch_and_convert(endpoint, params)
     
-    @covert_model(86400, Station)
+    @convert_model(86400, Station)
     def get_station(
         self,
         cityCode: int,
@@ -87,7 +87,7 @@ class TAGOClient:
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
         return self._fetch_and_convert(endpoint, params)
     
-    @covert_model(86400, Station, is_cached=False)
+    @convert_model(86400, Station, is_cached=False)
     def get_station_by_gps(
         self,
         gpsLati: float,
@@ -98,7 +98,7 @@ class TAGOClient:
         params = build_params(self.auth, gpsLati=gpsLati, gpsLong=gpsLong)
         return self._fetch_and_convert(endpoint, params)
 
-
+    @convert_model(model=ArrivalInfo, is_cached=False)
     def get_arrival_by_station(
         self,
         cityCode: int,
@@ -107,8 +107,9 @@ class TAGOClient:
         """실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params, ArrivalInfo)
-    
+        return self._fetch_and_convert(endpoint, params)
+
+    @convert_model(model=ArrivalInfo, is_cached=False)
     def get_route_arrival_by_station(
         self,
         cityCode: int,
@@ -118,9 +119,9 @@ class TAGOClient:
         """특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, ArrivalInfo)
+        return self._fetch_and_convert(endpoint, params)
     
-
+    @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos(
         self, 
         cityCode: int,
@@ -129,8 +130,9 @@ class TAGOClient:
         """버스의 S위치정보의 목록을 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle, is_cache=False)
+        return self._fetch_and_convert(endpoint, params)
 
+    @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos_near_station(
         self, 
         cityCode: int,
@@ -140,7 +142,7 @@ class TAGOClient:
         """특정정류소에 접근한 버스의 위치정보를 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle)
+        return self._fetch_and_convert(endpoint, params)
 
     def _fetch_and_convert(
             self,

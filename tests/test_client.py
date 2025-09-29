@@ -60,6 +60,20 @@ class TestTagoClient(unittest.TestCase):
 
         print(stations)
 
+    @patch.object(TAGOClient, "_get")
+    def test_get_station_once(self, mock_get):
+        fake_response = {"response": {"body": {
+            "items": {
+                "item": {'routeid': "DGB573493541", 'routeno': 356, 'routetp': '123', 'nodenm': '이거보세요!!',
+                         'nodeno': 20075}
+            }
+        }}}
+        mock_get.return_value = fake_response
+
+        route = self.client.get_route_by_id(cityCode=25, routeId="DGB573493541")
+
+        print(route._client)
+
 
 if __name__ == "__main__":
     unittest.main()
