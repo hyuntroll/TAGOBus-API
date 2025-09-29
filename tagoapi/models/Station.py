@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING
 from .BaseModel import BaseModel
-if TYPE_CHECKING:
-    from .Route import Route
-    from tagoapi import TAGOClient
 
 class Station(BaseModel):
     # cache_key = "Station:<nodeId><nodenm>"
     cache_key = "Station:<nodeId>"
+    _lazy_fields = {
+        "routes": "_get_routes_by_station",
+    }
     
     def __init__(
         self,
@@ -18,7 +18,6 @@ class Station(BaseModel):
         cityCode: int = None,
         updowncd: int = None,
         nodeord: int = None,
-        # *routeList: list['Route']
     ):
         super().__init__(cityCode)
         self.nodeId = nodeId

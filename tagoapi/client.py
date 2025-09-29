@@ -144,6 +144,23 @@ class TAGOClient:
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
         return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
+
+    ######## method for LazyLoading ################
+
+
+    def _get_route(self, route: Route) -> Route:
+        return self.get_route_by_id(route.cityCode, route.routeId)
+
+    def _get_stations_by_route(self, route: Route) -> list[Station]:
+        return self.get_station_by_route(route.cityCode, route.routeId)
+
+    def _get_routes_by_station(self, station: Station) -> list[Route]:
+        return self.get_route_by_station(station.cityCode, station.nodeId)
+
+
+    ######## get util ################
+
+
     def _fetch_and_convert(
             self,
             endpoint: str,
@@ -152,15 +169,6 @@ class TAGOClient:
     ) -> list | dict:
         response = parse_metadata(self._get(endpoint, params))
         return {**response, **kwargs}
-
-
-    ######## method for LazyLoading ################
-    def _get_route(self, route: Route) -> Route:
-        return self.get_route_by_id(route.cityCode, route.routeId)
-
-    def _get_stations_by_route(self, route: Route) -> list[Station]:
-        return self.get_station_by_route(route.cityCode, route.routeId)
-    
 
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)

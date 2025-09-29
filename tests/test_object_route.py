@@ -6,7 +6,7 @@ from tagoapi.models.BaseList import BaseList
 
 class TestRoute(unittest.TestCase):
     def setUp(self):
-        self.route = Route("453", routeNo="북구1")
+        self.route = Route("453", routeNo="북구1", cityCode=22)
     def test_attributes(self): ## 속성 테스트
         print("\n====== test attributes ======")
 
@@ -27,11 +27,11 @@ class TestRoute(unittest.TestCase):
     def test_lazy_load_in_class(self): ## lazy_load ( attribute in class )
         print("\n====== test lazy_load ( attribute in class ) ======")
 
-        route = Route("453", routeNo="북구4")
+        route = Route("453", routeNo="북구4", cityCode=22)
 
         # client_mock 생성
         mock_client = MagicMock()
-        mock_client.get_route_by_id.return_value = Route("453", routeNo="북구4", endvehicletime=53)
+        mock_client.get_route_by_id.return_value = Route("453", routeNo="북구4", endvehicletime=53, cityCode=22)
         route.set_client(mock_client)
 
         print(route.routeNo)
@@ -41,7 +41,7 @@ class TestRoute(unittest.TestCase):
     def test_lazy_load_not_in_class(self): ## lazy_load ( attribute not in class )
         print("\n====== test lazy_load ( attribute not in class ) ======")
 
-        route = Route("564", routeNo="북구2")
+        route = Route("564", routeNo="북구2", cityCode=22)
 
         mock_client = MagicMock()
         mock_client.get_stations.return_value = BaseList([
