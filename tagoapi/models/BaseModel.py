@@ -7,8 +7,9 @@ class BaseModel:
     cache_key = "BaseModel:<id>"
     _lazy_fields: dict = {}
 
-    def __init__(self):
+    def __init__(self, cityCode: int):
         self._client = None
+        self.cityCode = cityCode
           
     def to_dict(self) -> dict:
         return vars(self)

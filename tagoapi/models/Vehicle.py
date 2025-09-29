@@ -4,7 +4,7 @@ from .BaseModel import BaseModel
 class Vehicle(BaseModel):
     def __init__(
         self,
-        route: Route = None, 
+        cityCode: int,
         routeId: str = None,
         routeNo: str = None,
         gpsLati: float = None,
@@ -14,7 +14,7 @@ class Vehicle(BaseModel):
         vehicleTp: str = None,
         vehicleNo: str = None
     ):
-        self.route = route
+        super().__init__(cityCode)
         self.routeId = routeId
         self.routeNo = routeNo
         self.gpsLati = gpsLati

@@ -20,7 +20,7 @@ class Station(BaseModel):
         nodeord: int = None,
         # *routeList: list['Route']
     ):
-        super().__init__()
+        super().__init__(cityCode)
         self.nodeId = nodeId
         self.nodeNm = nodeNm
         self.nodeNo = nodeNo

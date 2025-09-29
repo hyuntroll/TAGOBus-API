@@ -5,6 +5,7 @@ class ArrivalInfo(BaseModel):
     def __init__(self,
         nodeId,
         nodeNm,
+        cityCode,
         routeId: str,
         routeNo: str,
         routeTp,
@@ -12,6 +13,7 @@ class ArrivalInfo(BaseModel):
         vehicleTp: str = None,
         arrtime: int = None
     ):
+        super().__init__(cityCode)
         self.nodeId = nodeId
         self.nodeNm = nodeNm
         self.routeId = routeId

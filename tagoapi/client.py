@@ -154,10 +154,10 @@ class TAGOClient:
 
 
     ######## method for LazyLoading ################
-    def _get_route(self,
-        cityCode: int,
-        routeId: str) -> Route:
-        return self.get_route_by_id(cityCode, routeId)
+    def _get_route(self, route: Route) -> Route:
+        return self.get_route_by_id(route.cityCode, route.routeId)
+
+    def _get_stations_by_route(self,):
     
 
     def _get(self, endpoint: str, params: dict) -> any:

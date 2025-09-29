@@ -8,11 +8,19 @@ if TYPE_CHECKING:
 # 버스 노선 자체에 관한 정보
 class Route(BaseModel):
     cache_key = "Route:<routeId>"
-    _lazy_fields = {"endvehicletime": "get_route_by_id"}
+    _lazy_fields = {
+        "endvehicletime": "_get_route",
+        "startvehicletime": "_get_route",
+        "intervaltime": "_get_route",
+        "intervalsattime": "_get_route",
+        "intervalsuntime": "_get_route",
+        "stations": "_get_stations_by_route"
+    }
 
     def __init__(
         self,
         routeId: str,
+        cityCode: int,
         routeNo: str = None,
         routeTp: str = None,
         endNodeNm: str = None,
@@ -23,7 +31,7 @@ class Route(BaseModel):
         intervalsuntime: int = None
         #TODO: 정류장 리스트도 넣으면 좋을 듯 합니당
     ):
-        super().__init__()
+        super().__init__(cityCode)
         
         self.routeId = routeId
         self.routeNo = routeNo
