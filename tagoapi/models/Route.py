@@ -53,6 +53,7 @@ class Route(BaseModel):
     def from_dict(cls, data: dict) -> "Route":
         return cls(
             routeId=data.get("routeid"),
+            cityCode=data.get("citycode"),
             routeNo=data.get("routeno"),
             routeTp=data.get("routetp"),
             startNodeNm=data.get("startnodenm"),

@@ -4,7 +4,7 @@ import os
 
 U = TypeVar('U', dict[str], list) # list, dict으로 반환할 때
 
-def parse_metadata(res: dict) -> None:
+def parse_metadata(res: dict) -> U | None:
     striped = res.get("response", {}).get("body", {}).get("items", {})
     if isinstance(striped, dict):
         return striped.get("item", None)

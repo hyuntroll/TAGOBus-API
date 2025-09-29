@@ -36,7 +36,7 @@ class TAGOClient:
         """노선 번호로 버스를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
         
     @convert_model(604800, Route, is_list=False)
     def get_route_by_id(
@@ -47,7 +47,7 @@ class TAGOClient:
         """노선 ID로 버스 정보를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
     @convert_model(604800, Route)
     def get_route_by_station(
@@ -58,7 +58,7 @@ class TAGOClient:
         """정류소를 경유하는 노선을 조회합니다"""
         endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
         params = build_params(self.auth, cityCode=cityCode, nodeid=nodeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
 
     @convert_model(604800, Station)
@@ -70,7 +70,7 @@ class TAGOClient:
         """노선이 경유하는 정류소를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
     @convert_model(86400, Station)
     def get_station(
@@ -85,7 +85,7 @@ class TAGOClient:
 
         endpoint = f'{self.BUSTATION}/getSttnNoList'
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
     @convert_model(86400, Station, is_cached=False)
     def get_station_by_gps(
@@ -107,7 +107,7 @@ class TAGOClient:
         """실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
     @convert_model(model=ArrivalInfo, is_cached=False)
     def get_route_arrival_by_station(
@@ -119,7 +119,7 @@ class TAGOClient:
         """특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
     @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos(
@@ -130,7 +130,7 @@ class TAGOClient:
         """버스의 S위치정보의 목록을 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
     @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos_near_station(
@@ -142,22 +142,24 @@ class TAGOClient:
         """특정정류소에 접근한 버스의 위치정보를 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
     def _fetch_and_convert(
             self,
             endpoint: str,
             params: dict,
+            **kwargs
     ) -> list | dict:
         response = parse_metadata(self._get(endpoint, params))
-        return response
+        return {**response, **kwargs}
 
 
     ######## method for LazyLoading ################
     def _get_route(self, route: Route) -> Route:
         return self.get_route_by_id(route.cityCode, route.routeId)
 
-    def _get_stations_by_route(self,):
+    def _get_stations_by_route(self, route: Route) -> list[Station]:
+        return self.get_station_by_route(route.cityCode, route.routeId)
     
 
     def _get(self, endpoint: str, params: dict) -> any:
