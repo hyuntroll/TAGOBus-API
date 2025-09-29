@@ -78,7 +78,6 @@ class TAGOClient:
         cityCode: int,
         nodeNo: int = None,
         nodeNm: str = None,
-        _is_cached: bool = True
     ) -> list[Station]:
         """정류소명 또는 번호로 정류소를 조회합니다"""
         if not (nodeNo or nodeNm):
@@ -88,16 +87,16 @@ class TAGOClient:
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
         return self._fetch_and_convert(endpoint, params)
     
-    @covert_model(86400)
+    @covert_model(86400, Station, is_cached=False)
     def get_station_by_gps(
         self,
         gpsLati: float,
-        gpsLong: float
+        gpsLong: float,
     ) -> list[Station]:
         """GPS 좌표 기반으로 주변 정류소를 조회합니다"""
         endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
         params = build_params(self.auth, gpsLati=gpsLati, gpsLong=gpsLong)
-        return self._fetch_and_convert(endpoint, params, Station)
+        return self._fetch_and_convert(endpoint, params)
 
 
     def get_arrival_by_station(

@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import TYPE_CHECKING
 from .cache import Cache
 from ..models.BaseList import BaseList
@@ -9,11 +10,9 @@ if TYPE_CHECKING:
 cache = Cache()   
 
 # method에서만 사용할 함수
-def covert_model(ttl: int = 86400, model: type["BaseModel"] = None, is_list: bool = True): # 데코레이터가 사용할 매개변수
+def covert_model(ttl: int = 86400, model: type["BaseModel"] = None, is_cached: bool = True, is_list: bool = True): # 데코레이터가 사용할 매개변수
     def decorator(fn): # 호출할 함수를 매개변수로 받음
         def inner(self, *args, **kwargs): # 호출할 함수의 매개변수를 받아서 이를 실행
-            is_cached = kwargs.pop("_is_cached", True)
-
             key = _make_cache_key(*args, _fname=fn.__name__, **kwargs) if is_cached else None
             cached = cache.get(key) if key else None
 

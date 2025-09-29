@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from tagoapi import TAGOClient, TAGOAuth
+from tagoapi import TAGOClient, TAGOAuth, cache
 
 class TestTagoClient(unittest.TestCase):
     def setUp(self):
@@ -43,9 +43,22 @@ class TestTagoClient(unittest.TestCase):
 
         stations = self.client.get_station(cityCode=543, nodeNm="엄랭1")
 
-
+        print(cache.current_cache)
         print(stations)
 
+    @patch.object(TAGOClient, "_get")
+    def test_get_station_no_cache(self, mock_get):
+        fake_response = {"response": {"body": {
+            "items": {
+                "item": {'gpslati': 35.86615, 'gpslong': 128.60002, 'nodeid': 'DGB1234123423', 'nodenm': '이거보세요!!',
+                         'nodeno': 20075}
+            }
+        }}}
+        mock_get.return_value = fake_response
+
+        stations = self.client.get_station_by_gps(gpsLati=1, gpsLong=3.425)
+
+        print(stations)
 
 
 if __name__ == "__main__":
