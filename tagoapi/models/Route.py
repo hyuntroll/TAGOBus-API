@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 # 버스 노선 자체에 관한 정보
 class Route(BaseModel):
     cache_key = "Route:<routeId>"
+    _lazy_fields = {"endvehicletime": "get_route_by_id"}
 
     def __init__(
         self,
@@ -18,6 +19,8 @@ class Route(BaseModel):
         startNodeNm: str = None,
         endvehicletime: int = None,
         startvehicletime: int = None,
+        intervalsattime: int = None,
+        intervalsuntime: int = None
         #TODO: 정류장 리스트도 넣으면 좋을 듯 합니당
     ):
         super().__init__()
@@ -29,6 +32,8 @@ class Route(BaseModel):
         self.startNodeNm = startNodeNm
         self.endvehicletime = endvehicletime
         self.startvehicletime = startvehicletime
+        self.intervalsattime = intervalsattime
+        self.intervalsuntime = intervalsuntime
 
     def __repr__(self):
         return f"Route({self.routeNo})"
@@ -45,7 +50,9 @@ class Route(BaseModel):
             startNodeNm=data.get("startnodenm"),
             endNodeNm=data.get("endnodenm"),
             endvehicletime=data.get("endvehicletime"),
-            startvehicletime=data.get("startvehicletime")
+            startvehicletime=data.get("startvehicletime"),
+            intervalsattime=data.get("intervalsattime"),
+            intervalsuntime=data.get("intervalsuntime")
         )
     
     # @classmethod
