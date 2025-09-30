@@ -157,6 +157,17 @@ class TAGOClient:
     def _get_routes_by_station(self, station: Station) -> list[Route]:
         return self.get_route_by_station(station.cityCode, station.nodeId)
 
+    def _get_station_by_arrival_info(self, arrivalInfo: ArrivalInfo) -> Station:
+        return self.get_station(arrivalInfo.cityCode, nodeNo=arrivalInfo.nodeNo)[0]
+
+    def _get_route_by_arrival_info(self, arrivalInfo: ArrivalInfo) -> Route:
+        return self.get_route_by_id(arrivalInfo.cityCode, arrivalInfo.routeId)
+
+    def _get_route_by_vehicle(self, vehicle: Vehicle) -> Route:
+        return self.get_route_by_id(vehicle.cityCode, vehicle.routeId)
+
+    def _get_station_by_vehicle(self, vehicle: Vehicle) -> Station:
+        return self.get_station(vehicle.cityCode, nodeNo=vehicle.nodeNo)[0];
 
     ######## get util ################
 

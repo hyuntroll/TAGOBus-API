@@ -2,6 +2,11 @@ from .Route import Route
 from .BaseModel import BaseModel
 
 class Vehicle(BaseModel):
+    _lazy_fields = {
+        "route": '_get_route_by_vehicle',
+        "station": '_get_station_by_vehicle'
+    }
+
     def __init__(
         self,
         cityCode: int,

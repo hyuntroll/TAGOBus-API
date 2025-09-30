@@ -2,6 +2,11 @@ from .BaseModel import BaseModel
 
 
 class ArrivalInfo(BaseModel):
+    _lazy_fields = {
+        "station": "_get_station_by_arrival_info",
+        "routes": "_get_route_by_arrival_info"
+    }
+
     def __init__(self,
         nodeId,
         nodeNm,
