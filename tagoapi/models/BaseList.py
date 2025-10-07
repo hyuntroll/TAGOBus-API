@@ -3,7 +3,7 @@ if TYPE_CHECKING:
     from tagoapi.models.BaseModel import BaseModel
     from tagoapi import TAGOClient
 
-class BaseList(list): # list 상속 받아도 좋을듯
+class BaseList(list):
 
     def as_list(self) -> list["BaseModel"]:
         return list(self)

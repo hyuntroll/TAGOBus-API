@@ -60,6 +60,8 @@ class BaseModel:
         if super().__getattribute__(item) is not None:
             return super().__getattribute__(item)
         if super().__getattribute__("_client") is None:
+            if item == "_client":
+                return super().__getattribute__("_client")
             raise RuntimeError(f"{self.__class__.__name__} cannot be loaded without client")
 
         raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")

@@ -31,15 +31,15 @@ class TestRoute(unittest.TestCase):
 
         # client_mock 생성
         mock_client = MagicMock()
-        mock_client.get_route_by_id.return_value = Route("453", routeNo="북구4", endvehicletime=53, cityCode=22)
+        mock_client._get_route.return_value = Route("453", routeNo="북구4", endvehicletime=53, cityCode=22)
         route.set_client(mock_client)
 
         print(route.routeNo)
 
         print(route.endvehicletime)
 
-    def test_lazy_load_not_in_class(self): ## lazy_load ( attribute not in class )
-        print("\n====== test lazy_load ( attribute not in class ) ======")
+    def test_custom_lazy_load_not_in_class(self): ## custom lazy_load ( attribute not in class )
+        print("\n====== test custom lazy_load ( attribute not in class ) ======")
 
         route = Route("564", routeNo="북구2", cityCode=22)
 
@@ -57,6 +57,23 @@ class TestRoute(unittest.TestCase):
         print(route.routeNo)
         print(route.stations)
 
+    def test_lazy_load_not_in_class(self): ## lazy_load ( attribute not in class )
+        print("\n====== test lazy_load ( attribute not in class ) ======")
+
+        route = Route("564", routeNo="북구2", cityCode=22)
+
+        mock_client = MagicMock()
+        mock_client._get_stations_by_route.return_value = BaseList([
+            Station("안녕하시귀", "이런다"),
+            Station("안녕하시귀", "이런다1"),
+            Station("안녕하시귀", "이런다2"),
+            Station("안녕하시귀", "이런다3")
+        ])
+
+        route.set_client(mock_client)
+
+        print(route.routeNo)
+        print(route.stations[0]._client)
 
 
 
