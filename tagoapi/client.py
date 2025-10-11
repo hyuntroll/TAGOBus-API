@@ -154,6 +154,9 @@ class TAGOClient:
     def _get_stations_by_route(self, route: Route) -> list[Station]:
         return self.get_station_by_route(route.cityCode, route.routeId)
 
+    def _get_station(self, station: Station) -> Station:
+        return self.get_station(station.cityCode, nodeNm=station.nodeNm)[0]
+
     def _get_routes_by_station(self, station: Station) -> list[Route]:
         return self.get_route_by_station(station.cityCode, station.nodeId)
 

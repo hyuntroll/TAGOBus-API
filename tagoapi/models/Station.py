@@ -6,6 +6,7 @@ class Station(BaseModel):
     cache_key = "Station:<nodeId>"
     _lazy_fields = {
         "routes": "_get_routes_by_station",
+        "nodeNo": "_get_station", # csv에서 nodeId로 찾을 수 있도록 수정
     }
     
     def __init__(

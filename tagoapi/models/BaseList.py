@@ -8,7 +8,7 @@ class BaseList(list):
     def as_list(self) -> list["BaseModel"]:
         return list(self)
 
-    def set_client(self, client: "TAGOClient"):
+    def set_client(self, client: "TAGOClient") -> "BaseList":
         for element in self:
             element.set_client(client)
 
