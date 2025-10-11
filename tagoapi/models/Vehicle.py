@@ -1,5 +1,8 @@
 from .Route import Route
 from .BaseModel import BaseModel
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .Route import Route
 
 class Vehicle(BaseModel):
     _lazy_fields = {
@@ -10,8 +13,7 @@ class Vehicle(BaseModel):
     def __init__(
         self,
         cityCode: int,
-        routeId: str = None,
-        routeNo: str = None,
+        route: Route,
         gpsLati: float = None,
         gpsLong: float = None,
         arrtime: int = None,
@@ -20,8 +22,7 @@ class Vehicle(BaseModel):
         vehicleNo: str = None
     ):
         super().__init__(cityCode)
-        self.routeId = routeId
-        self.routeNo = routeNo
+        self.route = route
         self.gpsLati = gpsLati
         self.gpsLong = gpsLong
         self.arrtime = arrtime
@@ -38,9 +39,7 @@ class Vehicle(BaseModel):
     @classmethod
     def from_dict(cls, data: dict) -> "Vehicle":
         return cls(
-            route=data.get("route"),
-            routeId=data.get("routeid"),
-            routeNo=data.get("routeno", data.get("routenm")),
+            route=Route.from_dict(data),
             gpsLati=data.get("gpslati"),
             gpsLong=data.get("gpslong"),
             arrtime=data.get("arrtime"),

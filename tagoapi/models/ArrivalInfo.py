@@ -1,4 +1,8 @@
 from .BaseModel import BaseModel
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .Station import Station
+    from .Route import Route
 
 
 class ArrivalInfo(BaseModel):
@@ -8,22 +12,16 @@ class ArrivalInfo(BaseModel):
     }
 
     def __init__(self,
-        nodeId,
-        nodeNm,
+        node: Station,
+        route: Route,
         cityCode,
-        routeId: str,
-        routeNo: str,
-        routeTp,
         arrprevstationcnt: int = None,
         vehicleTp: str = None,
         arrtime: int = None
     ):
         super().__init__(cityCode)
-        self.nodeId = nodeId
-        self.nodeNm = nodeNm
-        self.routeId = routeId
-        self.routeNo = routeNo
-        self.routeTp = routeTp
+        self.node = node
+        self.route = route
         self.arrprevstationcnt = arrprevstationcnt
         self.vehicleTp = vehicleTp
         self.arrtime = arrtime
@@ -37,11 +35,8 @@ class ArrivalInfo(BaseModel):
     @classmethod
     def from_dict(cls, data: dict) -> "ArrivalInfo":
         return cls(
-            nodeId=data.get("nodeid"),
-            nodeNm=data.get("nodeid"),
-            routeTp=data.get("routetp"),
-            routeId = data.get("routeid"),
-            routeNo = data.get("routeno"),
+            node=Station.from_dict(data),
+            route=Route.from_dict(data["route"]),
             arrprevstationcnt = data.get("arrprevstationcnt"),
             vehicleTp = data.get("vehicletp"),
             arrtime = data.get("arrtime")
