@@ -76,63 +76,71 @@ print(stations)
 - `Route` : 버스 노선 정보  
 - `ArrivalInfo` : 버스 도착 정보
 
-#### 공통 메서드
+
+---
+
+### 도메인 객체 필드 목록
+
+#### **BaseModel**
+도메인 객체들의 상위 객체 입니다.
+
+다음과 같은 공통 메서드를 제공합니다.
 ~~~python
 obj.to_dict()             # 객체 → dict 변환
 BaseModel.from_dict(dict) # dict → 객체 변환
 BaseModel.from_list(list) # dict 리스트 → 객체 리스트 변환
 ~~~
 
----
+### **BaseList**
+도메인 객체들을 요소로 갖는 list 입니다.
+기본적으로 Python의 기본 자료형인 list를 상속 받습니다.
 
-### 도메인 객체 필드 목록
+### **Station**
+| 필드명        | 타입                | 설명                     |
+|------------|-------------------|------------------------|
+| `nodeId`   | `str`             | 정류소 ID                 |
+| `nodeNm`   | `str`             | 정류소명                   |
+| `nodeNo`   | `int`             | 정류소 번호                 |
+| `gpsLati`  | `float`           | 위도 (WGS84)             |
+| `gpsLong`  | `float`           | 경도 (WGS84)             |
+| `cityCode` | `int`             | 도시코드                   |
+| `updowncd` | `int`             | 상하행구분코드 (`0`: 상행, `1`: 하행) |
+| `nodeord`  | `int`             | 정류소순번                  |
+| `routes`   | `BaseList[Route]` | 정류소를 경유하는 노선           |
 
-#### **Station**
-| 필드명 | 타입 | 설명 |
-|--------|------|------|
-| `nodeId` | `str` | 정류소 ID |
-| `nodeNm` | `str` | 정류소명 |
-| `nodeNo` | `int` | 정류소 번호 |
+
+### **Route**
+| 필드명                | 타입                  | 설명           |
+|--------------------|---------------------|--------------|
+| `routeId`          | `str`               | 노선 ID        |
+| `routeNo`          | `str`               | 노선명          |
+| `routeTp`          | `int`               | 노선유형         |
+| `endNodeNm`        | `str`               | 종점           |
+| `startNodeNm`      | `str`               | 기점           |
+| `endvehicletime`   | `int`               | 막차시간         |
+| `startvehicletime` | `int`               | 첫차시간         |
+| `stations`         | `BaseList[Station]` | 노선이 경유하는 정류소 |
+
+
+### **ArrivalInfo**
+| 필드명                 | 타입        | 설명     |
+|---------------------|-----------|--------|
+| `node`              | `Station` | 정류소 정보 |
+| `route`             | `Route`   | 노선 정보  |
+| `arrprevstationcnt` | `int`     | 노선유형   |
+| `vehicletp`         | `str`     | 차랑유형   |
+| `arrtime`           | `int`     | 도착예상시간 |
+
+### **Vehicle**
+| 필드명 | 타입      | 설명         |
+|--------|---------|------------|
+| `route` | `Route` | 노선 정보      |
 | `gpsLati` | `float` | 위도 (WGS84) |
 | `gpsLong` | `float` | 경도 (WGS84) |
-| `cityCode` | `int` | 도시코드 |
-| `updowncd` | `int` | 상하행구분코드 (`0`: 상행, `1`: 하행) |
-| `nodeord` | `int` | 정류소순번 |
-
-#### **Route**
-| 필드명 | 타입 | 설명 |
-|--------|------|------|
-| `routeId` | `str` | 노선 ID |
-| `routeNo` | `str` | 노선명 |
-| `routeTp` | `int` | 노선유형 |
-| `endNodeNm` | `str` | 종점 |
-| `startNodeNm` | `str` | 기점 |
-| `endvehicletime` | `int` | 막차시간 |
-| `startvehicletime` | `int` | 첫차시간 |
-
-#### **ArrivalInfo**
-| 필드명 | 타입 | 설명 |
-|--------|------|------|
-| `nodeId` | `str` | 정류소 ID |
-| `nodeNm` | `str` | 정류소명 |
-| `routeId` | `str` | 노선 ID |
-| `routeNo` | `str` | 노선명 |
-| `routeTp` | `int` | 노선유형 |
-| `arrprevstationcnt` | `int` | 노선유형 |
-| `vehicletp` | `str` | 차랑유형 |
-| `arrtime` | `int` | 도착예상시간 |
-
-#### **Vehicle**
-| 필드명 | 타입 | 설명 |
-|--------|------|------|
-| `routeId` | `str` | 노선 ID |
-| `routeNo` | `str` | 노선명 |
-| `gpsLati` | `float` | 위도 (WGS84) |
-| `gpsLong` | `float` | 경도 (WGS84) |
-| `arrtime` | `int` | 도착예상시간 |
-| `arrprevstationcnt` | `int` | 노선유형 |
-| `vehicleTp` | `str` | 차랑유형 |
-| `vehicleNo` | `str` | 차랑번호 |
+| `arrtime` | `int`   | 도착예상시간     |
+| `arrprevstationcnt` | `int`   | 노선유형       |
+| `vehicleTp` | `str`   | 차랑유형       |
+| `vehicleNo` | `str`   | 차랑번호       |
 
 
 
