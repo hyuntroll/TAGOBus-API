@@ -3,7 +3,7 @@ from .utils import *
 from .models import *
 from .auth import TAGOAuth
 
-from typing import Union, Optional, overload
+from typing import Optional, overload
 
 
 

@@ -1,10 +1,13 @@
 from typing import TYPE_CHECKING
 from tagoapi.models.BaseList import BaseList
+from tagoapi.utils import KeyExtract
+
 if TYPE_CHECKING:
     from tagoapi import TAGOClient
 
 class BaseModel:
     cache_key = "BaseModel:<id>"
+    _key = KeyExtract(cache_key)
     _lazy_fields: dict = {}
 
     def __init__(self, cityCode: int):
@@ -65,4 +68,8 @@ class BaseModel:
             raise RuntimeError(f"{self.__class__.__name__} cannot be loaded without client")
 
         raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")
+
+    @property
+    def key(self) -> KeyExtract:
+        return self._key
 

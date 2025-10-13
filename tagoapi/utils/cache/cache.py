@@ -65,3 +65,11 @@ class Cache:
     @property
     def current_cache(self):
         return self._cache
+
+cache = Cache()
+
+
+def _generate_cache_key(*args, _fname: str, **kwargs) -> str:
+    return _fname + ":" + "&".join([str(a) for a in args]) + "&".join(
+        f"{key}={value}" for key, value in kwargs.items()
+    ) ## str로 나타낼 수 없으면 다르게 표시하도록

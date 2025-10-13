@@ -3,16 +3,12 @@ from .client import TAGOClient
 from .auth import TAGOAuth
 
 
-from .models import Route
-from .models import Vehicle
-from .models import Station
+from .models import *
 
 # from .utils import get_city_code
-from .utils.cache_util import convert_model
-from .utils.parser import KeyExtract
-from .utils.cache_util import cache
+
 from .utils.get_station import get_station
 
 
 
-__all__ = [ 'TAGOClient', 'TAGOAuth', 'convert_model', 'Route', 'Vehicle', 'Station', 'KeyExtract', 'cache', 'get_station' ]
+__all__ = [ 'TAGOClient', 'TAGOAuth', 'BaseModel', 'BaseList', 'Route', 'Vehicle', 'Station', 'get_station' ]
