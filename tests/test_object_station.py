@@ -1,3 +1,4 @@
+import copy
 import unittest
 from unittest.mock import MagicMock
 
@@ -23,6 +24,18 @@ class TestRoute(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             print("endtime:", self.station.routes)
+
+    def test_lazy_loading_station(self):
+        print("\n====== test lazy_loading_station ( attribute not in class ======")
+
+        station = copy.deepcopy(self.station)
+
+        mock_client = MagicMock()
+        mock_client._get_routes_by_station.return_value = BaseList([Route("564", routeNo="북구2", cityCode=22), Route("564", routeNo="북구2", cityCode=22), Route("564", routeNo="북구2", cityCode=22)])
+        station.set_client(mock_client)
+
+        print(station.routes)
+
 
     # def test_lazy_load_not_in_class(self): ## lazy_load ( attribute not in class )
     #     print("\n====== test lazy_load ( attribute not in class ) ======")

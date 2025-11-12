@@ -12,8 +12,8 @@ class ArrivalInfo(BaseModel):
     }
 
     def __init__(self,
-        node: Station,
-        route: Route,
+        node: "Station",
+        route: "Route",
         cityCode,
         arrprevstationcnt: int = None,
         vehicleTp: str = None,

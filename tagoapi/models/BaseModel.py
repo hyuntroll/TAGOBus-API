@@ -24,8 +24,8 @@ class BaseModel:
     def from_dict(cls, data: dict) -> "BaseModel": ...
 
     @classmethod
-    def from_list(cls, data: list) -> BaseList:
-        return BaseList([cls.from_dict(d) for d in data])
+    def from_list(cls, data: list, cityCode: str) -> BaseList:
+        return BaseList([cls.from_dict({**d, "cityCode": cityCode}) for d in data])
         # model = BaseList()
         # for element in data:
         #     model.append(cls.from_dict(element))

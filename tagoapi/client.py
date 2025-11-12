@@ -1,4 +1,5 @@
 from .exceptions import *
+from .utils.decorator import *
 from .utils import *
 from .models import *
 from .auth import TAGOAuth
@@ -179,10 +180,11 @@ class TAGOClient:
             self,
             endpoint: str,
             params: dict,
+            citycode: int,
             **kwargs
     ) -> list | dict:
         response = parse_metadata(self._get(endpoint, params))
-        return {**response, **kwargs}
+        return {"result":response, "cityCode": citycode}
 
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)

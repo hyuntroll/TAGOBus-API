@@ -7,8 +7,8 @@ from .models import *
 
 # from .utils import get_city_code
 
-from .utils.get_station import get_station
 
 
 
-__all__ = [ 'TAGOClient', 'TAGOAuth', 'BaseModel', 'BaseList', 'Route', 'Vehicle', 'Station', 'get_station' ]
+
+__all__ = [ 'TAGOClient', 'TAGOAuth', 'BaseModel', 'BaseList', 'Route', 'Vehicle', 'Station' ]

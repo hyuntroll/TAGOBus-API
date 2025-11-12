@@ -11,12 +11,17 @@ if TYPE_CHECKING:
 
 
 # method에서만 사용할 함수
-def convert_model(ttl: int = 86400, model: type["BaseModel"] = None, use_model: bool = False, is_cached: bool = True, is_list: bool = True): # 데코레이터가 사용할 매개변수
+def convert_model(
+        ttl: int = 86400,
+        model: type["BaseModel"] = None,
+        use_model: bool = False,
+        is_cached: bool = True,
+        is_list: bool = True
+): # 데코레이터가 사용할 매개변수
     def decorator(fn): # 호출할 함수를 매개변수로 받음
         def inner(self, *args, **kwargs): # 호출할 함수의 매개변수를 받아서 이를 실행
             key = _generate_cache_key(*args, _fname=fn.__name__, **kwargs) if is_cached else None
             cached = cache.get(key) if key else None
-
 
             if cached is None:
                 raw = fn(self, *args, **kwargs)
@@ -26,13 +31,12 @@ def convert_model(ttl: int = 86400, model: type["BaseModel"] = None, use_model: 
                     cache.save(key, raw, ttl)
             else:
                 raw = cached
-
             if model:
                 ## convert list
-                if isinstance(raw, list):
-                    res = model.from_list(raw)
+                if isinstance(raw.get("result"), list):
+                    res = model.from_list(raw.get("result"), raw.get("cityCode"))
                 else:
-                    res = model.from_dict(raw)
+                    res = model.from_dict({**(raw.get("result")), **raw.get("cityCode")})
                 # print(is_list and not isinstance(res, BaseList))
                 res.set_client(self)
                 return BaseList([res]) if is_list and not isinstance(res, BaseList) else res

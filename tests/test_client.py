@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
-from tagoapi import TAGOClient, TAGOAuth, cache
+from tagoapi import TAGOClient, TAGOAuth
+from tagoapi.utils.cache import cache
 
 class TestTagoClient(unittest.TestCase):
     def setUp(self):
