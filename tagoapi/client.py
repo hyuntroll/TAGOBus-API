@@ -1,9 +1,10 @@
 from .exceptions import *
+from .utils.decorator import *
 from .utils import *
 from .models import *
 from .auth import TAGOAuth
 
-from typing import Union, Optional, overload
+from typing import Optional, overload
 
 
 
@@ -27,7 +28,7 @@ class TAGOClient:
     @overload
     def get_station(self, cityCode: int, nodeNo: Optional[int], nodeNm: str) -> list[Station]: ...
 
-    @from_cache_or_fetch(604800)
+    @convert_model(604800, Route)
     def get_route_by_no(
         self,
         cityCode: int,
@@ -36,9 +37,9 @@ class TAGOClient:
         """노선 번호로 버스를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.auth, cityCode=cityCode, routeNo=routeNo)
-        return self._fetch_and_convert(endpoint, params, Route)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
         
-    @from_cache_or_fetch(604800)
+    @convert_model(604800, Route, is_list=False)
     def get_route_by_id(
         self,
         cityCode: int,
@@ -47,9 +48,9 @@ class TAGOClient:
         """노선 ID로 버스 정보를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Route, is_list=False)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
-    @from_cache_or_fetch(604800)
+    @convert_model(604800, Route)
     def get_route_by_station(
         self,
         cityCode: int,
@@ -58,10 +59,10 @@ class TAGOClient:
         """정류소를 경유하는 노선을 조회합니다"""
         endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
         params = build_params(self.auth, cityCode=cityCode, nodeid=nodeId)
-        return self._fetch_and_convert(endpoint, params, Route)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
 
-    @from_cache_or_fetch(604800)
+    @convert_model(604800, Station)
     def get_station_by_route(
         self,
         cityCode: int,
@@ -70,9 +71,9 @@ class TAGOClient:
         """노선이 경유하는 정류소를 조회합니다"""
         endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
         params= build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Station)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
-    @from_cache_or_fetch(86400)
+    @convert_model(86400, Station)
     def get_station(
         self,
         cityCode: int,
@@ -85,20 +86,20 @@ class TAGOClient:
 
         endpoint = f'{self.BUSTATION}/getSttnNoList'
         params= build_params(self.auth, cityCode=cityCode, nodeNm=nodeNm,nodeNo=nodeNo)
-        return self._fetch_and_convert(endpoint, params, Station)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
-    @from_cache_or_fetch(86400)
+    @convert_model(86400, Station, is_cached=False)
     def get_station_by_gps(
         self,
         gpsLati: float,
-        gpsLong: float
+        gpsLong: float,
     ) -> list[Station]:
         """GPS 좌표 기반으로 주변 정류소를 조회합니다"""
         endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
         params = build_params(self.auth, gpsLati=gpsLati, gpsLong=gpsLong)
-        return self._fetch_and_convert(endpoint, params, Station)
+        return self._fetch_and_convert(endpoint, params)
 
-
+    @convert_model(model=ArrivalInfo, is_cached=False)
     def get_arrival_by_station(
         self,
         cityCode: int,
@@ -107,8 +108,9 @@ class TAGOClient:
         """실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params, ArrivalInfo)
-    
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
+
+    @convert_model(model=ArrivalInfo, is_cached=False)
     def get_route_arrival_by_station(
         self,
         cityCode: int,
@@ -118,9 +120,9 @@ class TAGOClient:
         """특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
         endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
         params = build_params(self.auth, cityCode=cityCode, nodeId=nodeId, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, ArrivalInfo)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
     
-
+    @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos(
         self, 
         cityCode: int,
@@ -129,8 +131,9 @@ class TAGOClient:
         """버스의 S위치정보의 목록을 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle, is_cache=False)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
+    @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos_near_station(
         self, 
         cityCode: int,
@@ -140,70 +143,65 @@ class TAGOClient:
         """특정정류소에 접근한 버스의 위치정보를 조회합니다"""
         endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
         params = build_params(self.auth, cityCode=cityCode, routeId=routeId, nodeId=nodeId)
-        return self._fetch_and_convert(endpoint, params, Vehicle)
+        return self._fetch_and_convert(endpoint, params, citycode=cityCode)
 
+
+    ######## method for LazyLoading ################
+
+
+    def _get_route(self, route: Route) -> Route:
+        return self.get_route_by_id(route.cityCode, route.routeId)
+
+    def _get_stations_by_route(self, route: Route) -> list[Station]:
+        return self.get_station_by_route(route.cityCode, route.routeId)
+
+    def _get_station(self, station: Station) -> Station:
+        return self.get_station(station.cityCode, nodeNm=station.nodeNm)[0]
+
+    def _get_routes_by_station(self, station: Station) -> list[Route]:
+        return self.get_route_by_station(station.cityCode, station.nodeId)
+
+    def _get_station_by_arrival_info(self, arrivalInfo: ArrivalInfo) -> Station:
+        return self.get_station(arrivalInfo.cityCode, nodeNo=arrivalInfo.nodeNo)[0]
+
+    def _get_route_by_arrival_info(self, arrivalInfo: ArrivalInfo) -> Route:
+        return self.get_route_by_id(arrivalInfo.cityCode, arrivalInfo.routeId)
+
+    def _get_route_by_vehicle(self, vehicle: Vehicle) -> Route:
+        return self.get_route_by_id(vehicle.cityCode, vehicle.routeId)
+
+    def _get_station_by_vehicle(self, vehicle: Vehicle) -> Station:
+        return self.get_station(vehicle.cityCode, nodeNo=vehicle.nodeNo)[0];
+
+    ######## get util ################
 
 
     def _fetch_and_convert(
-            self, 
-            endpoint: str, 
-            params: dict, 
-            model: BaseModel,
-            is_list: bool = True,
-            is_cache: bool = True
-    ) -> BaseModel:
-        cache_key = KeyExtract(model)
+            self,
+            endpoint: str,
+            params: dict,
+            citycode: int,
+            **kwargs
+    ) -> list | dict:
         response = parse_metadata(self._get(endpoint, params))
-        if not response: 
-            return None 
-        
-        ## Convert to List
-        if isinstance(response, list):
+        return {"result":response, "cityCode": citycode}
 
-            if not is_cache:
-                return convert(response, model.from_list, self)
-            
-            result = []
-            for v in response:
-                key = cache_key.generate_key(v)
-                cached = cache.get(key)
-                if cached:
-                    result.append(cached)
-                else:
-                    parsed_obj = convert(v, model.from_dict)
-                    result.append(parsed_obj)
-                    cache.save(key, parsed_obj, self.CACHE_TTL)
-
-            return result
-        
-        ## Covert to Dict
-        else:
-            
-            if is_cache: 
-                key = cache_key.generate_key(response)
-                cached = cache.get(key)
-                if cached:
-                    return [cached] if is_list else cached
-            result = convert(response, model.from_dict)
-            cache.save(key, result, self.CACHE_TTL)
-            return [result] if is_list else result
-
-    
     def _get(self, endpoint: str, params: dict) -> any:
         response = http_get(f"{self.BASE_URL}/{endpoint}", params=params)
         error_code = response.get("returnReasonCode")
-    
+
+        if not error_code:
+            return response
+        
         if error_code == '20':
             raise ServiceAccessDeniedError("서비스에 접근이 거부되었습니다.")
         elif error_code == '22':
             raise RequestExcessdsError("서비스 요청제한횟수를 초과했습니다.")
-        if error_code == '30':
+        elif error_code == '30':
             raise ServiceKeyNotRegisteredError("유효하지 않는 서비스키 입니다.")
         elif error_code == '31':
             raise DeadLineHasExpired("API활용기간이 만료되었습니다.")
         elif error_code == '32':
             raise UnRegisteredIpError("등록되지 않은 IP입니다.")
-        elif error_code:
+        else:
             raise RuntimeError(f"실행중 오류가 발생했습니다. 에러코드: {error_code}")
-
-        return response

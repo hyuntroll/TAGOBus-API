@@ -1,11 +1,13 @@
 from typing import TYPE_CHECKING
 from .BaseModel import BaseModel
-if TYPE_CHECKING:
-    from .Route import Route
 
 class Station(BaseModel):
     # cache_key = "Station:<nodeId><nodenm>"
     cache_key = "Station:<nodeId>"
+    _lazy_fields = {
+        "routes": "_get_routes_by_station",
+        "nodeNo": "_get_station", # csv에서 nodeId로 찾을 수 있도록 수정
+    }
     
     def __init__(
         self,
@@ -16,9 +18,9 @@ class Station(BaseModel):
         gpsLong: float = None,
         cityCode: int = None,
         updowncd: int = None,
-        nodeord: int = None
-        # *routeList: list['Route']
+        nodeord: int = None,
     ):
+        super().__init__(cityCode)
         self.nodeId = nodeId
         self.nodeNm = nodeNm
         self.nodeNo = nodeNo
@@ -45,10 +47,10 @@ class Station(BaseModel):
             gpsLong = float(data.get("gpslong")),
             cityCode = data.get("citycode"),
             updowncd = data.get("updowncd"),
-            nodeord = data.get("nodeord")
+            nodeord = data.get("nodeord"),
         )
     
-    @classmethod
-    def from_list(cls, data: list[dict]) -> list["Station"]:
-        return [cls.from_dict(station) for station in data]
+    # @classmethod
+    # def from_list(cls, data: list[dict]) -> list["Station"]:
+    #     return [cls.from_dict(station, client) for station in data]
     
