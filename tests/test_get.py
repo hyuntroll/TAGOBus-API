@@ -15,7 +15,7 @@ client = TAGOClient(TAGOAuth(api_key))
 # print(client.get_route_by_no(routeNo="북구", cityCode=22))
 print(cache.current_cache)
 
-route = client.get_route_by_no(routeNo="북구", cityCode=22)
+route = client.get_route_by_no(routeNo="북구1", cityCode=22)
 
 # pprint(cache.current_cache)
 print(route[0].stations)

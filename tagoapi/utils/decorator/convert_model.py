@@ -34,10 +34,10 @@ def convert_model(
             if model:
                 ## convert list
                 if isinstance(raw.get("result"), list):
-                    res = model.from_list(raw.get("result"), raw.get("cityCode"))
+                    res = model.from_list(raw.get("result"), raw.get("citycode"))
                 else:
-                    res = model.from_dict({**(raw.get("result")), **raw.get("cityCode")})
-                # print(is_list and not isinstance(res, BaseList))
+                    res = model.from_dict({**(raw.get("result")), "citycode": raw.get("cityCode")})
+
                 res.set_client(self)
                 return BaseList([res]) if is_list and not isinstance(res, BaseList) else res
 
