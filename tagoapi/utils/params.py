@@ -1,3 +1,6 @@
+from typing import Union, Optional, List
+
+
 def build_params(
         service_key: str,
         num_of_rows: int = 300,
@@ -21,15 +24,14 @@ def build_params(
             **kwargs,
         }
 
-def parse_metadata(res: dict) -> U | None:
+def parse_metadata(res: dict) -> Optional[dict]:
     striped = res.get("response", {}).get("body", {}).get("items", {})
     if isinstance(striped, dict):
         return striped.get("item", None)
-
     return None
 
 
-def _check_bracket(data: str) -> list[str]:
+def _check_bracket(data: str) -> List[str]:
     args = []
     current_match = None
     fa = ''
@@ -54,16 +56,12 @@ class KeyExtract:  ## 이를 BaseModel에 바로/
         self.raw_key = raw_key
 
         self._args = _check_bracket(self.raw_key)
-
     @property
     def key_args(self):
         return self._args
 
     def generate_key(self, data: dict) -> str:
         generated_key = self.raw_key
-        # if len(kwargs) > len(self._args):
-        #     raise TypeError(f"generate_key() takes {len(self._args)} positional argument but {len(kwargs)} were given")
-
         # TODO: 이거 self._args말고 kwargs.keys해서 arg랑 대응 시켜서 없으면 raise 이런식으로 작성해도 좋을 듯
         for arg in self._args:
             k = data.get(arg.lower(), None)
