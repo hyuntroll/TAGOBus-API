@@ -27,13 +27,17 @@ class TAGOClient:
     @convert_model(604800, Route)
     def get_route_by_no(
         self,
-        city_code: int,
-        route_no: str
+        city_code: int = None,
+        route_no: str = None,
+        cityCode: int = None,
+        routeNo: str = None,
     ) -> list[Route]:
         """노선 번호로 버스를 조회합니다
         :param city_code: 도시 코드
         :param route_no: 노선 번호
         """
+        city_code = city_code if city_code is not None else cityCode
+        route_no = route_no if route_no is not None else routeNo
         endpoint = f'{self.BUSROUTE}/getRouteNoList'
         params = build_params(self.service_key, kwargs={"city_code": city_code, "route_no": route_no})
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
@@ -41,10 +45,14 @@ class TAGOClient:
     @convert_model(604800, Route, is_list=False)
     def get_route_by_id(
         self,
-        city_code: int,
-        route_id: str
+        city_code: int = None,
+        route_id: str = None,
+        cityCode: int = None,
+        routeId: str = None,
     ) -> Route:
         """노선 ID로 버스 정보를 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        route_id = route_id if route_id is not None else routeId
         endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
         params = build_params(self.service_key, kwargs={"city_code": city_code, "route_id": route_id})
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
@@ -52,10 +60,14 @@ class TAGOClient:
     @convert_model(604800, Route)
     def get_route_by_station(
         self,
-        city_code: int,
-        station_id: str
+        city_code: int = None,
+        station_id: str = None,
+        cityCode: int = None,
+        nodeId: str = None,
     ) -> list[Route]:
         """정류소를 경유하는 노선을 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        station_id = station_id if station_id is not None else nodeId
         endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
         params = build_params(self.service_key, kwargs={"city_code": city_code, "station_id": station_id})
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
@@ -64,10 +76,14 @@ class TAGOClient:
     @convert_model(604800, Station)
     def get_station_by_route(
         self,
-        city_code: int,
-        route_id: str
+        city_code: int = None,
+        route_id: str = None,
+        cityCode: int = None,
+        routeId: str = None,
     ) -> list[Station]:
         """노선이 경유하는 정류소를 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        route_id = route_id if route_id is not None else routeId
         endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
         params = build_params(self.service_key, kwargs={"city_code": city_code, "route_id": route_id})
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
@@ -75,11 +91,17 @@ class TAGOClient:
     @convert_model(86400, Station)
     def get_station(
         self,
-        city_code: int,
+        city_code: int = None,
         station_no: int = None,
         station_name: str = None,
+        cityCode: int = None,
+        nodeNo: int = None,
+        nodeNm: str = None,
     ) -> list[Station]:
         """정류소명 또는 번호로 정류소를 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        station_no = station_no if station_no is not None else nodeNo
+        station_name = station_name if station_name is not None else nodeNm
         if not (station_no or station_name):
             raise ValueError("Only one of 'station_no' or 'station_name' should be provided.")
 
@@ -90,10 +112,14 @@ class TAGOClient:
     @convert_model(86400, Station, is_cached=False)
     def get_station_by_gps(
         self,
-        gps_lati: float,
-        gps_long: float,
+        gps_lati: float = None,
+        gps_long: float = None,
+        gpsLati: float = None,
+        gpsLong: float = None,
     ) -> list[Station]:
         """GPS 좌표 기반으로 주변 정류소를 조회합니다"""
+        gps_lati = gps_lati if gps_lati is not None else gpsLati
+        gps_long = gps_long if gps_long is not None else gpsLong
         endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
         params = build_params(self.service_key, kwargs={"gps_lati": gps_lati, "gps_long": gps_long})
         return self._fetch_and_convert(endpoint, params)
@@ -101,47 +127,80 @@ class TAGOClient:
     @convert_model(model=ArrivalInfo, is_cached=False)
     def get_arrival_by_station(
         self,
-        city_code: int,
-        nodeId: str,
+        city_code: int = None,
+        station_id: str = None,
+        node_id: str = None,
+        cityCode: int = None,
+        nodeId: str = None,
     ) -> list[ArrivalInfo]:
         """실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        normalized_station_id = station_id or node_id or nodeId
         endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
-        params = build_params(self.auth, city_code=city_code, nodeId=nodeId)
+        params = build_params(self.service_key, kwargs={"city_code": city_code, "nodeId": normalized_station_id})
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
 
     @convert_model(model=ArrivalInfo, is_cached=False)
     def get_route_arrival_by_station(
         self,
-        city_code: int,
-        nodeId: str,
-        routeId: str,
+        city_code: int = None,
+        station_id: str = None,
+        node_id: str = None,
+        route_id: str = None,
+        cityCode: int = None,
+        nodeId: str = None,
+        routeId: str = None,
     ) -> list[ArrivalInfo]:
         """특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        normalized_station_id = station_id or node_id or nodeId
+        normalized_route_id = route_id or routeId
         endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
-        params = build_params(self.auth, city_code=city_code, nodeId=nodeId, routeId=routeId)
+        params = build_params(
+            self.service_key,
+            kwargs={"city_code": city_code, "nodeId": normalized_station_id, "routeId": normalized_route_id},
+        )
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
     
     @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos(
         self, 
-        city_code: int,
-        routeId: int,
+        city_code: int = None,
+        route_id: int = None,
+        cityCode: int = None,
+        routeId: int = None,
     ) -> list[Vehicle]:
         """버스의 S위치정보의 목록을 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        normalized_route_id = route_id if route_id is not None else routeId
         endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
-        params = build_params(self.auth, city_code=city_code, routeId=routeId)
+        params = build_params(self.service_key, kwargs={"city_code": city_code, "routeId": normalized_route_id})
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
 
     @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos_near_station(
         self, 
-        city_code: int,
-        routeId: int,
-        nodeId: int,
+        city_code: int = None,
+        route_id: int = None,
+        station_id: int = None,
+        node_id: int = None,
+        cityCode: int = None,
+        routeId: int = None,
+        nodeId: int = None,
     ) -> list[Vehicle]:
         """특정정류소에 접근한 버스의 위치정보를 조회합니다"""
+        city_code = city_code if city_code is not None else cityCode
+        normalized_route_id = route_id if route_id is not None else routeId
+        normalized_station_id = (
+            station_id
+            if station_id is not None
+            else (node_id if node_id is not None else nodeId)
+        )
         endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
-        params = build_params(self.auth, city_code=city_code, routeId=routeId, nodeId=nodeId)
+        params = build_params(
+            self.service_key,
+            kwargs={"city_code": city_code, "routeId": normalized_route_id, "nodeId": normalized_station_id},
+        )
         return self._fetch_and_convert(endpoint, params, city_code=city_code)
 
 
@@ -149,25 +208,25 @@ class TAGOClient:
 
 
     def _get_route(self, route: Route) -> Route:
-        return self.get_route_by_id(route.city_code, route.routeId)
+        return self.get_route_by_id(route.city_code, route.route_id)
 
     def _get_stations_by_route(self, route: Route) -> list[Station]:
-        return self.get_station_by_route(route.city_code, route.routeId)
+        return self.get_station_by_route(route.city_code, route.route_id)
 
     def _get_station(self, station: Station) -> Station:
         return self.get_station(station.city_code, station_name=station.station_name)[0]
 
     def _get_routes_by_station(self, station: Station) -> list[Route]:
-        return self.get_route_by_station(station.city_code, station.nodeId)
+        return self.get_route_by_station(station.city_code, station.station_id)
 
-    def _get_station_by_arrival_info(self, arrivalInfo: ArrivalInfo) -> Station:
-        return self.get_station(arrivalInfo.city_code, station_no=arrivalInfo.station_no)[0]
+    def _get_station_by_arrival_info(self, arrival_info: ArrivalInfo) -> Station:
+        return self.get_station(arrival_info.city_code, station_no=arrival_info.station_no)[0]
 
-    def _get_route_by_arrival_info(self, arrivalInfo: ArrivalInfo) -> Route:
-        return self.get_route_by_id(arrivalInfo.city_code, arrivalInfo.routeId)
+    def _get_route_by_arrival_info(self, arrival_info: ArrivalInfo) -> Route:
+        return self.get_route_by_id(arrival_info.city_code, arrival_info.route_id)
 
     def _get_route_by_vehicle(self, vehicle: Vehicle) -> Route:
-        return self.get_route_by_id(vehicle.city_code, vehicle.routeId)
+        return self.get_route_by_id(vehicle.city_code, vehicle.route_id)
 
     def _get_station_by_vehicle(self, vehicle: Vehicle) -> Station:
         return self.get_station(vehicle.city_code, station_no=vehicle.station_no)[0];

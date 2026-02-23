@@ -19,6 +19,7 @@ def convert_model(
         is_list: bool = True
 ): # 데코레이터가 사용할 매개변수
     def decorator(fn): # 호출할 함수를 매개변수로 받음
+        @wraps(fn)
         def inner(self, *args, **kwargs): # 호출할 함수의 매개변수를 받아서 이를 실행
             key = _generate_cache_key(*args, _fname=fn.__name__, **kwargs) if is_cached else None
             cached = cache.get(key) if key else None
@@ -32,11 +33,12 @@ def convert_model(
             else:
                 raw = cached
             if model:
+                city_code = raw.get("city_code", raw.get("cityCode", raw.get("citycode")))
                 ## convert list
                 if isinstance(raw.get("result"), list):
-                    res = model.from_list(raw.get("result"), raw.get("citycode"))
+                    res = model.from_list(raw.get("result"), city_code=city_code)
                 else:
-                    res = model.from_dict({**(raw.get("result")), "citycode": raw.get("cityCode")})
+                    res = model.from_dict({**(raw.get("result")), "citycode": city_code})
 
                 res.set_client(self)
                 return BaseList([res]) if is_list and not isinstance(res, BaseList) else res
@@ -45,4 +47,3 @@ def convert_model(
             return raw
         return inner
     return decorator
-

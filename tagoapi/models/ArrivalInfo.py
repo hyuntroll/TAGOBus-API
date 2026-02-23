@@ -1,4 +1,6 @@
 from .BaseModel import BaseModel
+from .Station import Station
+from .Route import Route
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .Station import Station
@@ -41,6 +43,22 @@ class ArrivalInfo(BaseModel):
             vehicleTp = data.get("vehicletp"),
             arrtime = data.get("arrtime")
         )
+
+    @property
+    def node_id(self) -> str:
+        return self.node.nodeId
+
+    @property
+    def station_id(self) -> str:
+        return self.node.nodeId
+
+    @property
+    def station_no(self) -> int:
+        return self.node.nodeNo
+
+    @property
+    def route_id(self) -> str:
+        return self.route.routeId
     
     # @classmethod
     # def from_list(cls, data: list[dict]) -> list["ArrivalInfo"]:

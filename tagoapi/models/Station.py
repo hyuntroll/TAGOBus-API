@@ -49,6 +49,38 @@ class Station(BaseModel):
             updowncd = data.get("updowncd"),
             nodeord = data.get("nodeord"),
         )
+
+    @property
+    def node_id(self) -> str:
+        return self.nodeId
+
+    @property
+    def station_id(self) -> str:
+        return self.nodeId
+
+    @property
+    def node_name(self) -> str:
+        return self.nodeNm
+
+    @property
+    def station_name(self) -> str:
+        return self.nodeNm
+
+    @property
+    def node_no(self) -> int:
+        return self.nodeNo
+
+    @property
+    def station_no(self) -> int:
+        return self.nodeNo
+
+    @property
+    def gps_lati(self) -> float:
+        return self.gpsLati
+
+    @property
+    def gps_long(self) -> float:
+        return self.gpsLong
     
     # @classmethod
     # def from_list(cls, data: list[dict]) -> list["Station"]:
