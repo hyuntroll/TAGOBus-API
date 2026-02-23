@@ -63,6 +63,26 @@ class Route(BaseModel):
             intervalsattime=data.get("intervalsattime"),
             intervalsuntime=data.get("intervalsuntime")
         )
+
+    @property
+    def route_id(self) -> str:
+        return self.routeId
+
+    @property
+    def route_no(self) -> str:
+        return self.routeNo
+
+    @property
+    def route_type(self) -> str:
+        return self.routeTp
+
+    @property
+    def end_node_name(self) -> str:
+        return self.endNodeNm
+
+    @property
+    def start_node_name(self) -> str:
+        return self.startNodeNm
     
     # @classmethod
     # def from_list(cls, data: list[dict]) -> list["Route"]:

@@ -1,36 +1,37 @@
-from typing import TYPE_CHECKING
-from typing import TypeVar
+from typing import Union, Optional, List
 
-U = TypeVar('U', dict[str], list)  # list, dict으로 반환할 때
-
-
-if TYPE_CHECKING:
-    from tagoapi import TAGOAuth
 
 def build_params(
-        auth: "TAGOAuth",
-        numOfRows: int = 300,
-        pageNo: int = 1,
-        **kwargs: dict
-    ) -> dict:
+        service_key: str,
+        num_of_rows: int = 300,
+        page_no: int = 1,
+        kwargs: dict = None
+) -> dict:
+    #TODO: 설명 수정
+    """
+    요청을 보내기 위한 파라미터를 완성합니다.
+    :param service_key: 서비스 키
+    :param num_of_rows: 항목당 나올 횟수 설정
+    :param page_no: 페이지
+    :param kwargs: 안에 들어가야하는 파라미터
+    """
 
     return {
-            "serviceKey": auth.serviceKey,
-            "numOfRows": numOfRows,
-            "pageNo": pageNo,
+            "serviceKey": service_key,
+            "numOfRows": num_of_rows,
+            "pageNo": page_no,
             "_type": "json",
-            **{key: value for key, value in kwargs.items() if value}
+            **kwargs,
         }
 
-def parse_metadata(res: dict) -> U | None:
+def parse_metadata(res: dict) -> Optional[dict]:
     striped = res.get("response", {}).get("body", {}).get("items", {})
     if isinstance(striped, dict):
         return striped.get("item", None)
-
     return None
 
 
-def _check_bracket(data: str) -> list[str]:
+def _check_bracket(data: str) -> List[str]:
     args = []
     current_match = None
     fa = ''
@@ -55,16 +56,12 @@ class KeyExtract:  ## 이를 BaseModel에 바로/
         self.raw_key = raw_key
 
         self._args = _check_bracket(self.raw_key)
-
     @property
     def key_args(self):
         return self._args
 
     def generate_key(self, data: dict) -> str:
         generated_key = self.raw_key
-        # if len(kwargs) > len(self._args):
-        #     raise TypeError(f"generate_key() takes {len(self._args)} positional argument but {len(kwargs)} were given")
-
         # TODO: 이거 self._args말고 kwargs.keys해서 arg랑 대응 시켜서 없으면 raise 이런식으로 작성해도 좋을 듯
         for arg in self._args:
             k = data.get(arg.lower(), None)

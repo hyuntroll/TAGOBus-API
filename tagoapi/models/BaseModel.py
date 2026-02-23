@@ -10,9 +10,9 @@ class BaseModel:
     _key = KeyExtract(cache_key)
     _lazy_fields: dict = {}
 
-    def __init__(self, cityCode: int):
+    def __init__(self, city_code: int):
         self._client = None
-        self.cityCode = cityCode
+        self.city_code = city_code
           
     def to_dict(self) -> dict:
         return vars(self)
@@ -24,8 +24,17 @@ class BaseModel:
     def from_dict(cls, data: dict) -> "BaseModel": ...
 
     @classmethod
-    def from_list(cls, data: list, cityCode: int) -> BaseList:
-        return BaseList([cls.from_dict({**d, "cityCode": cityCode}) for d in data])
+    def from_list(
+        cls,
+        data: list,
+        city_code: int = None,
+        cityCode: int = None,
+    ) -> BaseList:
+        normalized_city_code = city_code if city_code is not None else cityCode
+        return BaseList(
+            cls.from_dict({**d, "citycode": normalized_city_code})
+            for d in data
+        )
 
     def __getattr__(self, item):
 
@@ -68,3 +77,10 @@ class BaseModel:
     def key(self) -> KeyExtract:
         return self._key
 
+    @property
+    def cityCode(self) -> int:
+        return self.city_code
+
+    @cityCode.setter
+    def cityCode(self, value: int):
+        self.city_code = value
