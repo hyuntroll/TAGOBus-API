@@ -49,9 +49,9 @@ pip install Unoffical-TAGO-API
 ### 1. 클라이언트 생성
 
 ```python
-from tagoapi import TAGOClient, TAGOAuth
+from tagoapi import TAGOClient
 
-client = TAGOClient(auth=TAGOAuth("YOUR_SERVICE_KEY"))
+client = TAGOClient(service_key="YOUR_SERVICE_KEY")
 ```
 ---
 
