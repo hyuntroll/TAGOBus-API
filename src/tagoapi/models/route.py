@@ -1,0 +1,89 @@
+from typing import TYPE_CHECKING
+from .base_model import BaseModel
+
+if TYPE_CHECKING:
+    from .station import Station
+
+
+# 버스 노선 자체에 관한 정보
+class Route(BaseModel):
+    cache_key = "Route:<routeId>"
+    _lazy_fields = {
+        "endvehicletime": "_get_route",
+        "startvehicletime": "_get_route",
+        "intervaltime": "_get_route",
+        "intervalsattime": "_get_route",
+        "intervalsuntime": "_get_route",
+        "stations": "_get_stations_by_route"
+    }
+
+    def __init__(
+        self,
+        routeId: str,
+        cityCode: int,
+        routeNo: str = None,
+        routeTp: str = None,
+        endNodeNm: str = None,
+        startNodeNm: str = None,
+        endvehicletime: int = None,
+        startvehicletime: int = None,
+        intervalsattime: int = None,
+        intervalsuntime: int = None
+        #TODO: 정류장 리스트도 넣으면 좋을 듯 합니당
+    ):
+        super().__init__(cityCode)
+        
+        self.routeId = routeId
+        self.routeNo = routeNo
+        self.routeTp = routeTp
+        self.endNodeNm = endNodeNm # 다른 곳에서 표시할 땐 이름으로
+        self.startNodeNm = startNodeNm
+        self.endvehicletime = endvehicletime
+        self.startvehicletime = startvehicletime
+        self.intervalsattime = intervalsattime
+        self.intervalsuntime = intervalsuntime
+
+    def __repr__(self):
+        return f"Route({self.routeNo})"
+    
+    def to_dict(self):
+        return vars(self)
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> "Route":
+        return cls(
+            routeId=data.get("routeid"),
+            cityCode=data.get("citycode"),
+            routeNo=data.get("routeno"),
+            routeTp=data.get("routetp"),
+            startNodeNm=data.get("startnodenm"),
+            endNodeNm=data.get("endnodenm"),
+            endvehicletime=data.get("endvehicletime"),
+            startvehicletime=data.get("startvehicletime"),
+            intervalsattime=data.get("intervalsattime"),
+            intervalsuntime=data.get("intervalsuntime")
+        )
+
+    @property
+    def route_id(self) -> str:
+        return self.routeId
+
+    @property
+    def route_no(self) -> str:
+        return self.routeNo
+
+    @property
+    def route_type(self) -> str:
+        return self.routeTp
+
+    @property
+    def end_node_name(self) -> str:
+        return self.endNodeNm
+
+    @property
+    def start_node_name(self) -> str:
+        return self.startNodeNm
+    
+    # @classmethod
+    # def from_list(cls, data: list[dict]) -> list["Route"]:
+    #     return [ cls.from_dict(route) for route in data ]
