@@ -1,6 +1,7 @@
 from tagoapi._internal.transport import HttpTransport
+from .resource import TagoResource
 
 
-class ArrivalResource:
+class ArrivalResource(TagoResource):
     def __init__(self, transport: HttpTransport) -> None:
-        self._transport = transport
+        super().__init__(transport)
