@@ -2,5 +2,12 @@ from .route_resource import RouteResource
 from .arrival_resource import ArrivalResource
 from .station_resource import StationResource
 from .vehicle_resource import VehicleResource
+from .page import TagoPage
 
-__all__ = ["RouteResource", "ArrivalResource", "StationResource", "VehicleResource"]
+__all__ = [
+    "RouteResource",
+    "ArrivalResource",
+    "StationResource",
+    "VehicleResource",
+    "TagoPage",
+]

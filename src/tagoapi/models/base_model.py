@@ -1,86 +1,150 @@
-from typing import TYPE_CHECKING
-from src.tagoapi.models.base_list import BaseList
-from src.tagoapi.utils import KeyExtract
+from abc import ABC, abstractmethod
+from typing import Any, ClassVar, Mapping, TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
-    from src.tagoapi import TAGOClient
+    from tagoapi.client import TAGOClient
 
-class BaseModel:
-    cache_key = "BaseModel:<id>"
-    _key = KeyExtract(cache_key)
-    _lazy_fields: dict = {}
 
-    def __init__(self, city_code: int):
-        self._client = None
+BaseModelT = TypeVar("BaseModelT", bound="BaseModel")
+_UNSET = object()
+
+
+class BaseModel(ABC):
+    _lazy_fields: ClassVar[dict[str, str]] = {}
+
+    def __init__(self, city_code: int | None):
+        object.__setattr__(self, "_client", None)
+        object.__setattr__(self, "_loading_lazy_groups", set())
+        object.__setattr__(self, "_lazy_values", {})
         self.city_code = city_code
-          
-    def to_dict(self) -> dict:
-        return vars(self)
 
-    def set_client(self, client: "TAGOClient"):
-        self._client = client
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name in type(self)._lazy_fields:
+            lazy_values = self.__dict__.get("_lazy_values")
+            if lazy_values is not None:
+                if value is None:
+                    lazy_values[name] = _UNSET
+                    self.__dict__.pop(name, None)
+                    return
+                lazy_values[name] = value
 
-    @classmethod
-    def from_dict(cls, data: dict) -> "BaseModel": ...
+        object.__setattr__(self, name, value)
 
-    @classmethod
-    def from_list(
-        cls,
-        data: list,
-        city_code: int = None,
-        cityCode: int = None,
-    ) -> BaseList:
-        normalized_city_code = city_code if city_code is not None else cityCode
-        return BaseList(
-            cls.from_dict({**d, "citycode": normalized_city_code})
-            for d in data
+    def __getattr__(self, field_name: str) -> Any:
+        if field_name in type(self)._lazy_fields:
+            return self._load_lazy_field(field_name)
+
+        raise AttributeError(
+            f"{type(self).__name__} has no attribute {field_name}"
         )
 
-    def __getattr__(self, item):
+    def to_dict(self) -> dict:
+        return {
+            key: self._serialize(value)
+            for key, value in vars(self).items()
+            if not key.startswith("_")
+        }
 
-        if item in self._lazy_fields:
-            if self._client is None:
-                raise RuntimeError(f"{self.__class__.__name__} cannot be loaded without client")
+    @classmethod
+    @abstractmethod
+    def from_dict(
+        cls: type[BaseModelT],
+        data: Mapping[str, Any],
+    ) -> BaseModelT:
+        raise NotImplementedError
 
-            _client = self._client
-            loader = getattr(_client, self._lazy_fields[item])
+    def bind_client(self: BaseModelT, client: "TAGOClient") -> BaseModelT:
+        object.__setattr__(self, "_client", client)
+        return self
+
+    def is_loaded(self, field_name: str) -> bool:
+        self._validate_lazy_field(field_name)
+        return self._lazy_values.get(field_name, _UNSET) is not _UNSET
+
+    def load(self, field_name: str) -> Any:
+        self._validate_lazy_field(field_name)
+        if self.is_loaded(field_name):
+            return self.__dict__[field_name]
+
+        return self._load_lazy_field(field_name)
+
+    def refresh(self, field_name: str) -> Any:
+        self._validate_lazy_field(field_name)
+        for grouped_field in self._lazy_group_fields(field_name):
+            self._lazy_values[grouped_field] = _UNSET
+            self.__dict__.pop(grouped_field, None)
+
+        return self._load_lazy_field(field_name)
+
+    def _load_lazy_field(self, field_name: str) -> Any:
+        self._validate_lazy_field(field_name)
+        if self.is_loaded(field_name):
+            return self.__dict__[field_name]
+
+        client = self._client
+        if client is None:
+            raise RuntimeError(
+                f"{type(self).__name__}.{field_name} cannot be loaded without client"
+            )
+
+        loader_name = type(self)._lazy_fields[field_name]
+        loading_groups = self._loading_lazy_groups
+        if loader_name in loading_groups:
+            raise RuntimeError(
+                f"Circular lazy loading detected for "
+                f"{type(self).__name__}.{field_name}"
+            )
+
+        loading_groups.add(loader_name)
+        try:
+            loader = getattr(client, loader_name)
             loaded_value = loader(self)
 
-            # 같은 개체라면 | 속성 저장
-            if isinstance(loaded_value, self.__class__):
-                for k, v in loaded_value.to_dict().items():
+            if isinstance(loaded_value, type(self)):
+                for grouped_field in self._lazy_group_fields(field_name):
+                    self._store_lazy_value(
+                        grouped_field,
+                        loaded_value.__dict__.get(grouped_field),
+                    )
+            else:
+                self._store_lazy_value(field_name, loaded_value)
 
-                    if not k.startswith("_"):
-                        setattr(self, k, v)
-            else: # 다른 개체라면 item = loaded_value
-                setattr(self, item, loaded_value)
+            if field_name not in self.__dict__:
+                self._store_lazy_value(field_name, None)
 
-            return self.__dict__[item]
+            return self.__dict__[field_name]
+        finally:
+            loading_groups.remove(loader_name)
 
+    def _lazy_group_fields(self, field_name: str) -> tuple[str, ...]:
+        loader_name = type(self)._lazy_fields[field_name]
+        return tuple(
+            name
+            for name, configured_loader in type(self)._lazy_fields.items()
+            if configured_loader == loader_name
+        )
 
-        raise AttributeError(f"{self.__class__.__name__} has no attribute {item}")
+    def _store_lazy_value(self, field_name: str, value: Any) -> None:
+        self._lazy_values[field_name] = value
+        object.__setattr__(self, field_name, value)
 
+    def _validate_lazy_field(self, field_name: str) -> None:
+        if field_name not in type(self)._lazy_fields:
+            raise AttributeError(
+                f"{type(self).__name__}.{field_name} is not a lazy field"
+            )
 
-    ## 모든 속성에 접근할 때 가장 먼저 호출되는 메서드
-    ## 구현할 때 없으면 raise 땡기고, 거기서 만약 인스턴스 두개가 다르면 그거 자체를 속성으로 저장하고 같으면 속성을 하나씩 저장하게
-    def __getattribute__(self, item):
-        if super().__getattribute__(item) is not None:
-            return super().__getattribute__(item)
-        if super().__getattribute__("_client") is None:
-            if item == "_client":
-                return super().__getattribute__("_client")
-            raise RuntimeError(f"{self.__class__.__name__} cannot be loaded without client")
-
-        raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")
-
-    @property
-    def key(self) -> KeyExtract:
-        return self._key
-
-    @property
-    def cityCode(self) -> int:
-        return self.city_code
-
-    @cityCode.setter
-    def cityCode(self, value: int):
-        self.city_code = value
+    @staticmethod
+    def _serialize(value: Any) -> Any:
+        if isinstance(value, BaseModel):
+            return value.to_dict()
+        if isinstance(value, list):
+            return [BaseModel._serialize(element) for element in value]
+        if isinstance(value, tuple):
+            return tuple(BaseModel._serialize(element) for element in value)
+        if isinstance(value, dict):
+            return {
+                key: BaseModel._serialize(element)
+                for key, element in value.items()
+            }
+        return value

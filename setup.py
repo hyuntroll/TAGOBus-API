@@ -7,10 +7,12 @@ setup(
     url="https://github.com/hyuntroll/TAGOBus-API",
     long_description=open('README.md', 'r', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
-    packages=find_packages(),
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     include_package_data=True,
     install_requires=[
         "requests",
+        "httpx",
         "xmltodict"
     ],
     license='MIT',

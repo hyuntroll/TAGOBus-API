@@ -1,22 +1,19 @@
-from tagoapi import TAGOAuth, TAGOClient
-from tagoapi.utils.cache import cache
-from pprint import pprint
-import time
+"""수동 TAGO 호출 예제.
 
-import os
-from dotenv import load_dotenv
-env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-load_dotenv(dotenv_path=env_path)
+pytest 수집 시에는 실행되지 않으며, 직접 실행할 때만 네트워크를 사용한다.
+"""
 
-api_key = os.environ.get("TAGO_API_KEY")
-client = TAGOClient(TAGOAuth(api_key))
 
-# print(cache.current_cache)
-# print(client.get_route_by_no(routeNo="북구", cityCode=22))
-print(cache.current_cache)
+if __name__ == "__main__":
+    import os
 
-route = client.get_route_by_no(routeNo="북구1", cityCode=22)
+    from dotenv import load_dotenv
 
-# pprint(cache.current_cache)
-print(route[0].stations)
+    from src.tagoapi import TAGOClient
 
+    load_dotenv()
+    api_key = os.environ["TAGO_API_KEY"]
+
+    with TAGOClient(api_key) as client:
+        routes = client.get_route_by_no(routeNo="북구1", cityCode=22)
+        print(routes)

@@ -43,7 +43,10 @@ class TestArrivalResourceWithStubTransport(unittest.TestCase):
             "/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList",
             transport.calls[0]["path"],
         )
-        self.assertEqual({"cityCode": 25, "nodeId": "N1"}, transport.calls[0]["params"])
+        self.assertEqual(
+            {"cityCode": 25, "nodeId": "N1", "_type": "json"},
+            transport.calls[0]["params"],
+        )
 
     def test_request_parses_multiple_items_as_list(self):
         fake_response = {
@@ -75,7 +78,10 @@ class TestArrivalResourceWithStubTransport(unittest.TestCase):
             "/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList",
             transport.calls[0]["path"],
         )
-        self.assertEqual({"cityCode": 25, "nodeId": "N1"}, transport.calls[0]["params"])
+        self.assertEqual(
+            {"cityCode": 25, "nodeId": "N1", "_type": "json"},
+            transport.calls[0]["params"],
+        )
 
     def test_request_returns_empty_dict_when_item_is_missing(self):
         fake_response = {

@@ -2,8 +2,8 @@ import copy
 import unittest
 from unittest.mock import MagicMock
 
-from tagoapi.models import Route, Station
-from tagoapi.models.BaseList import BaseList
+from src.tagoapi.models import Route, Station
+from src.tagoapi.models.base_list import BaseList
 
 class TestRoute(unittest.TestCase):
     def setUp(self):
@@ -31,28 +31,14 @@ class TestRoute(unittest.TestCase):
         station = copy.deepcopy(self.station)
 
         mock_client = MagicMock()
-        mock_client._get_routes_by_station.return_value = BaseList([Route("564", routeNo="북구2", cityCode=22), Route("564", routeNo="북구2", cityCode=22), Route("564", routeNo="북구2", cityCode=22)])
-        station.set_client(mock_client)
+        mock_client._get_routes_by_station.return_value = BaseList([
+            Route("564", city_code=22, route_no="북구2"),
+            Route("564", city_code=22, route_no="북구2"),
+            Route("564", city_code=22, route_no="북구2"),
+        ])
+        station.bind_client(mock_client)
 
         print(station.routes)
-
-
-    # def test_lazy_load_not_in_class(self): ## lazy_load ( attribute not in class )
-    #     print("\n====== test lazy_load ( attribute not in class ) ======")
-    #
-    #
-    #     station = Station("DGB573493541", "대구소프트웨어마이스터고등학교앞")
-    #
-    #     # client_mock 생성
-    #     mock_client = MagicMock()
-    #     mock_client._get_station.return_value = Station("DGB573493541", "대구소프트웨어마이스터고등학교앞")
-    #     station.set_client(mock_client)
-    #
-    #     print(station.nodeNm)
-    #
-    #     print(station.station)
-
-
 
 if __name__ == '__main__':
     unittest.main()

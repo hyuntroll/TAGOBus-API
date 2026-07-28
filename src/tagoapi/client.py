@@ -1,31 +1,35 @@
+from typing import Any
+
 from ._internal import HttpTransport
-from .exceptions import *
-from .resources.arrival_resource import ArrivalResource
-from .utils.decorator import *
-from .utils import *
-from .models import *
-
-from typing import Optional, overload
-
+from .models import ArrivalInfo, Route, Station, Vehicle
+from .resources import (
+    ArrivalResource,
+    RouteResource,
+    StationResource,
+    VehicleResource,
+)
 
 
 class TAGOClient:
-    BASE_URL = "http://apis.data.go.kr/1613000"
-    AVRINFO = "ArvlInfoInqireService"
-    BUSROUTE = 'BusRouteInfoInqireService'
-    BUSTATION = "BusSttnInfoInqireService"
-    BUSPOS = "BusLcInfoInqireService"
-    CACHE_TTL = 604800
+    """TAGO 전송 계층과 서비스별 Resource를 조립하는 진입점."""
 
+    BASE_URL = "http://apis.data.go.kr/1613000"
 
     def __init__(self, service_key: str) -> None:
-        self.service_key = service_key
-        self._service_key = service_key
+        if not service_key:
+            raise ValueError("service_key는 필수입니다.")
+
         self._transport = HttpTransport(
-            base_url="http://apis.data.go.kr/1613000",
+            base_url=self.BASE_URL,
             service_key=service_key,
         )
+        self.routes = RouteResource(self._transport)
+        self.stations = StationResource(self._transport)
         self.arrivals = ArrivalResource(self._transport)
+        self.vehicles = VehicleResource(self._transport)
+
+    def __enter__(self) -> "TAGOClient":
+        return self
 
     def __exit__(self, exc_type, exc, traceback) -> None:
         self.close()
@@ -33,233 +37,220 @@ class TAGOClient:
     def close(self) -> None:
         self._transport.close()
 
-
-    # depressed
-
-    @overload
-    def get_station(self, city_code: int, station_no: int) -> list[Station]: ...
-    @overload
-    def get_station(self, city_code: int, station_no: Optional[int], station_name: str) -> list[Station]: ...
-
-    @convert_model(604800, Route)
+    # 기존 공개 메서드는 cache 없이 새 Resource로 위임한다.
     def get_route_by_no(
         self,
-        city_code: int = None,
-        route_no: str = None,
-        cityCode: int = None,
-        routeNo: str = None,
+        city_code: int | None = None,
+        route_no: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeNo: str | None = None,
     ) -> list[Route]:
-        """노선 번호로 버스를 조회합니다
-        :param city_code: 도시 코드
-        :param route_no: 노선 번호
-        """
-        city_code = city_code if city_code is not None else cityCode
-        route_no = route_no if route_no is not None else routeNo
-        endpoint = f'{self.BUSROUTE}/getRouteNoList'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "route_no": route_no})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
-        
-    @convert_model(604800, Route, is_list=False)
+        normalized_city_code = self._coalesce(city_code, cityCode)
+        normalized_route_no = self._coalesce(route_no, routeNo)
+        return self.routes.list(
+            normalized_city_code,
+            normalized_route_no,
+        ).items
+
     def get_route_by_id(
         self,
-        city_code: int = None,
-        route_id: str = None,
-        cityCode: int = None,
-        routeId: str = None,
-    ) -> Route:
-        """노선 ID로 버스 정보를 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        route_id = route_id if route_id is not None else routeId
-        endpoint = f'{self.BUSROUTE}/getRouteInfoIem'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "route_id": route_id})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
+        city_code: int | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
+    ) -> Route | None:
+        return self.routes.get(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+        )
 
-    @convert_model(604800, Route)
     def get_route_by_station(
         self,
-        city_code: int = None,
-        station_id: str = None,
-        cityCode: int = None,
-        nodeId: str = None,
+        city_code: int | None = None,
+        station_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeId: str | None = None,
     ) -> list[Route]:
-        """정류소를 경유하는 노선을 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        station_id = station_id if station_id is not None else nodeId
-        endpoint = f'{self.BUSTATION}/getSttnThrghRouteList'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "station_id": station_id})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
-    
+        return self.stations.list_routes(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(station_id, nodeId),
+        ).items
 
-    @convert_model(604800, Station)
     def get_station_by_route(
         self,
-        city_code: int = None,
-        route_id: str = None,
-        cityCode: int = None,
-        routeId: str = None,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
     ) -> list[Station]:
-        """노선이 경유하는 정류소를 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        route_id = route_id if route_id is not None else routeId
-        endpoint = f'{self.BUSROUTE}/getRouteAcctoThrghSttnList'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "route_id": route_id})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
-    
-    @convert_model(86400, Station)
+        return self.routes.list_stations(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+        ).items
+
     def get_station(
         self,
-        city_code: int = None,
-        station_no: int = None,
-        station_name: str = None,
-        cityCode: int = None,
-        nodeNo: int = None,
-        nodeNm: str = None,
+        city_code: int | None = None,
+        station_no: str | int | None = None,
+        station_name: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeNo: str | int | None = None,
+        nodeNm: str | None = None,
     ) -> list[Station]:
-        """정류소명 또는 번호로 정류소를 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        station_no = station_no if station_no is not None else nodeNo
-        station_name = station_name if station_name is not None else nodeNm
-        if not (station_no or station_name):
-            raise ValueError("Only one of 'station_no' or 'station_name' should be provided.")
+        return self.stations.list(
+            self._coalesce(city_code, cityCode),
+            station_no=self._coalesce(station_no, nodeNo),
+            station_name=self._coalesce(station_name, nodeNm),
+        ).items
 
-        endpoint = f'{self.BUSTATION}/getSttnNoList'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "station_no": station_no, "station_name": station_name})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
-    
-    @convert_model(86400, Station, is_cached=False)
     def get_station_by_gps(
         self,
-        gps_lati: float = None,
-        gps_long: float = None,
-        gpsLati: float = None,
-        gpsLong: float = None,
+        gps_lati: float | None = None,
+        gps_long: float | None = None,
+        *,
+        gpsLati: float | None = None,
+        gpsLong: float | None = None,
     ) -> list[Station]:
-        """GPS 좌표 기반으로 주변 정류소를 조회합니다"""
-        gps_lati = gps_lati if gps_lati is not None else gpsLati
-        gps_long = gps_long if gps_long is not None else gpsLong
-        endpoint = f'{self.BUSTATION}/getCrdntPrxmtSttnList'
-        params = build_params(self.service_key, kwargs={"gps_lati": gps_lati, "gps_long": gps_long})
-        return self._fetch_and_convert(endpoint, params)
+        return self.stations.list_nearby(
+            self._coalesce(gps_lati, gpsLati),
+            self._coalesce(gps_long, gpsLong),
+        ).items
 
-    @convert_model(model=ArrivalInfo, is_cached=False)
     def get_arrival_by_station(
         self,
-        city_code: int = None,
-        station_id: str = None,
-        node_id: str = None,
-        cityCode: int = None,
-        nodeId: str = None,
+        city_code: int | None = None,
+        station_id: str | None = None,
+        node_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeId: str | None = None,
     ) -> list[ArrivalInfo]:
-        """실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        normalized_station_id = station_id or node_id or nodeId
-        endpoint = f'{self.AVRINFO}/getSttnAcctoArvlPrearngeInfoList'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "nodeId": normalized_station_id})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
+        return self.arrivals.list_by_station(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(station_id, node_id, nodeId),
+        ).items
 
-    @convert_model(model=ArrivalInfo, is_cached=False)
     def get_route_arrival_by_station(
         self,
-        city_code: int = None,
-        station_id: str = None,
-        node_id: str = None,
-        route_id: str = None,
-        cityCode: int = None,
-        nodeId: str = None,
-        routeId: str = None,
+        city_code: int | None = None,
+        station_id: str | None = None,
+        node_id: str | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeId: str | None = None,
+        routeId: str | None = None,
     ) -> list[ArrivalInfo]:
-        """특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        normalized_station_id = station_id or node_id or nodeId
-        normalized_route_id = route_id or routeId
-        endpoint = f'{self.AVRINFO}/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList'
-        params = build_params(
-            self.service_key,
-            kwargs={"city_code": city_code, "nodeId": normalized_station_id, "routeId": normalized_route_id},
-        )
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
-    
-    @convert_model(model=Vehicle, is_cached=False)
+        return self.arrivals.list_by_station_and_route(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(station_id, node_id, nodeId),
+            self._coalesce(route_id, routeId),
+        ).items
+
     def get_route_pos(
-        self, 
-        city_code: int = None,
-        route_id: int = None,
-        cityCode: int = None,
-        routeId: int = None,
+        self,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
     ) -> list[Vehicle]:
-        """버스의 S위치정보의 목록을 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        normalized_route_id = route_id if route_id is not None else routeId
-        endpoint = f'{self.BUSPOS}/getRouteAcctoBusLcList'
-        params = build_params(self.service_key, kwargs={"city_code": city_code, "routeId": normalized_route_id})
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
+        return self.vehicles.list_by_route(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+        ).items
 
-    @convert_model(model=Vehicle, is_cached=False)
     def get_route_pos_near_station(
-        self, 
-        city_code: int = None,
-        route_id: int = None,
-        station_id: int = None,
-        node_id: int = None,
-        cityCode: int = None,
-        routeId: int = None,
-        nodeId: int = None,
+        self,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        station_id: str | None = None,
+        node_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
+        nodeId: str | None = None,
     ) -> list[Vehicle]:
-        """특정정류소에 접근한 버스의 위치정보를 조회합니다"""
-        city_code = city_code if city_code is not None else cityCode
-        normalized_route_id = route_id if route_id is not None else routeId
-        normalized_station_id = (
-            station_id
-            if station_id is not None
-            else (node_id if node_id is not None else nodeId)
-        )
-        endpoint = f'{self.BUSPOS}/getRouteAcctoSpcifySttnAccesBusLcInfo'
-        params = build_params(
-            self.service_key,
-            kwargs={"city_code": city_code, "routeId": normalized_route_id, "nodeId": normalized_station_id},
-        )
-        return self._fetch_and_convert(endpoint, params, city_code=city_code)
+        return self.vehicles.list_approaching_station(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+            self._coalesce(station_id, node_id, nodeId),
+        ).items
 
-
-    ######## method for LazyLoading ################
-
-
-    def _get_route(self, route: Route) -> Route:
-        return self.get_route_by_id(route.city_code, route.route_id)
+    # BaseModel lazy loading을 다시 연결할 때 사용할 기존 loader 계약.
+    def _get_route(self, route: Route) -> Route | None:
+        return self.routes.get(route.city_code, route.route_id)
 
     def _get_stations_by_route(self, route: Route) -> list[Station]:
-        return self.get_station_by_route(route.city_code, route.route_id)
+        return self.routes.list_stations(
+            route.city_code,
+            route.route_id,
+        ).items
 
-    def _get_station(self, station: Station) -> Station:
-        return self.get_station(station.city_code, station_name=station.station_name)[0]
+    def _get_station(self, station: Station) -> Station | None:
+        stations = self.stations.list(
+            station.city_code,
+            station_no=station.station_no,
+            station_name=station.station_name,
+        ).items
+        return stations[0] if stations else None
 
     def _get_routes_by_station(self, station: Station) -> list[Route]:
-        return self.get_route_by_station(station.city_code, station.station_id)
+        return self.stations.list_routes(
+            station.city_code,
+            station.station_id,
+        ).items
 
-    def _get_station_by_arrival_info(self, arrival_info: ArrivalInfo) -> Station:
-        return self.get_station(arrival_info.city_code, station_no=arrival_info.station_no)[0]
+    def _get_station_by_arrival_info(
+        self,
+        arrival_info: ArrivalInfo,
+    ) -> Station | None:
+        stations = self.stations.list(
+            arrival_info.city_code,
+            station_no=arrival_info.station_no,
+            station_name=arrival_info.station_name,
+        ).items
+        return stations[0] if stations else None
 
-    def _get_route_by_arrival_info(self, arrival_info: ArrivalInfo) -> Route:
-        return self.get_route_by_id(arrival_info.city_code, arrival_info.route_id)
+    def _get_route_by_arrival_info(
+        self,
+        arrival_info: ArrivalInfo,
+    ) -> Route | None:
+        return self.routes.get(
+            arrival_info.city_code,
+            arrival_info.route_id,
+        )
 
-    def _get_route_by_vehicle(self, vehicle: Vehicle) -> Route:
-        return self.get_route_by_id(vehicle.city_code, vehicle.route_id)
+    def _get_route_by_vehicle(self, vehicle: Vehicle) -> Route | None:
+        return self.routes.get(vehicle.city_code, vehicle.route_id)
 
-    def _get_station_by_vehicle(self, vehicle: Vehicle) -> Station:
-        return self.get_station(vehicle.city_code, station_no=vehicle.station_no)[0];
+    def _get_station_by_vehicle(self, vehicle: Vehicle) -> Station | None:
+        if vehicle.station_id:
+            stations = self.stations.list(
+                vehicle.city_code,
+                station_name=vehicle.station_name,
+            ).items
+        else:
+            stations = self.stations.list(
+                vehicle.city_code,
+                station_no=vehicle.station_no,
+                station_name=vehicle.station_name,
+            ).items
+        return stations[0] if stations else None
 
-    ######## get util ################
+    def _get(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
+        """이전 테스트 및 확장 코드를 위한 Transport 위임 메서드."""
+        path = endpoint if endpoint.startswith("/") else f"/{endpoint}"
+        return self._transport.request(path, params=params)
 
-
-    def _fetch_and_convert(
-            self,
-            endpoint: str,
-            params: dict,
-            city_code: int,
-            **kwargs
-    ) -> list | dict:
-        response = parse_metadata(self._get(endpoint, params))
-        return {"result":response, "city_code": city_code}
-
-    def _get(self, endpoint: str, params: dict) -> any:
-        return self._transport.request(f"/{endpoint}", params=params)
+    @staticmethod
+    def _coalesce(*values: Any) -> Any:
+        for value in values:
+            if value is not None:
+                return value
+        return None

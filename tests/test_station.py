@@ -1,13 +1,18 @@
-from tagoapi import TAGOClient, TAGOAuth, cache
-import os
-from dotenv import load_dotenv
+"""수동 정류소 조회 예제.
 
-load_dotenv()
-key = os.environ.get("TAGO_API_KEY")
-client = TAGOClient(TAGOAuth(key))
+pytest 수집 시에는 실행되지 않으며, 직접 실행할 때만 네트워크를 사용한다.
+"""
 
-print(cache.current_cache)
 
-print(client.get_station(22, nodeNm="삼덕"))
+if __name__ == "__main__":
+    import os
 
-# print(get_station("대구소프트웨어마이스터고등학교"))
+    from dotenv import load_dotenv
+
+    from src.tagoapi import TAGOClient
+
+    load_dotenv()
+    api_key = os.environ["TAGO_API_KEY"]
+
+    with TAGOClient(api_key) as client:
+        print(client.get_station(22, nodeNm="삼덕"))

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.tagoapi.models.base_model import BaseModel
-    from src.tagoapi import TAGOClient
+    from tagoapi.client import TAGOClient
+    from tagoapi.models.base_model import BaseModel
 
 class BaseList(list):
 

@@ -1,72 +1,94 @@
-from .route import Route
+from typing import Any, Mapping, TYPE_CHECKING
+
 from .base_model import BaseModel
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .route import Route
+    from .station import Station
+
 
 class Vehicle(BaseModel):
     _lazy_fields = {
-        "route": '_get_route_by_vehicle',
-        "station": '_get_station_by_vehicle'
+        "route": "_get_route_by_vehicle",
+        "station": "_get_station_by_vehicle",
     }
 
     def __init__(
         self,
-        cityCode: int,
-        route: Route,
-        gpsLati: float = None,
-        gpsLong: float = None,
-        nodeNo: int = None,
-        arrtime: int = None,
-        arrprevstationcnt: int = None,
-        vehicleTp: str = None,
-        vehicleNo: str = None
+        route_id: str,
+        city_code: int | None,
+        route_no: str | None = None,
+        route_type: str | None = None,
+        station_id: str | None = None,
+        station_name: str | None = None,
+        station_no: str | None = None,
+        node_order: int | None = None,
+        gps_latitude: float | None = None,
+        gps_longitude: float | None = None,
+        arrival_time: int | None = None,
+        previous_station_count: int | None = None,
+        vehicle_type: str | None = None,
+        vehicle_no: str | None = None,
+        route: "Route | None" = None,
+        station: "Station | None" = None,
     ):
-        super().__init__(cityCode)
+        super().__init__(city_code)
+
+        self.route_id = route_id
+        self.route_no = route_no
+        self.route_type = route_type
+        self.station_id = station_id
+        self.station_name = station_name
+        self.station_no = station_no
+        self.node_order = node_order
+        self.gps_latitude = gps_latitude
+        self.gps_longitude = gps_longitude
+        self.arrival_time = arrival_time
+        self.previous_station_count = previous_station_count
+        self.vehicle_type = vehicle_type
+        self.vehicle_no = vehicle_no
         self.route = route
-        self.gpsLati = gpsLati
-        self.gpsLong = gpsLong
-        self.nodeNo = nodeNo
-        self.arrtime = arrtime
-        self.arrprevstationcnt = arrprevstationcnt
-        self.vehicleTp = vehicleTp
-        self.vehicleNo = vehicleNo
-    
-    def __repr__(self):
-        return f"Vehicle({self.routeNo} - {self.vehicleNo})"
-    
-    def to_dict(self):
-        return vars(self)
-    
-    @classmethod
-    def from_dict(cls, data: dict) -> "Vehicle":
-        return cls(
-            route=Route.from_dict(data),
-            gpsLati=data.get("gpslati"),
-            gpsLong=data.get("gpslong"),
-            nodeNo=data.get("nodeno"),
-            arrtime=data.get("arrtime"),
-            arrprevstationcnt=data.get("arrprevstationcnt"),
-            vehicleTp=data.get("vehicletp"),
-            vehicleNo=data.get("vehicleno")
+        self.station = station
+
+    def __repr__(self) -> str:
+        return (
+            f"Vehicle(route_id={self.route_id!r}, "
+            f"vehicle_no={self.vehicle_no!r})"
         )
 
-    @property
-    def route_id(self) -> str:
-        return self.route.routeId
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "Vehicle":
+        return cls(
+            route_id=data["routeid"],
+            city_code=data.get("citycode"),
+            route_no=_optional_str(data.get("routenm", data.get("routeno"))),
+            route_type=data.get("routetp"),
+            station_id=data.get("nodeid"),
+            station_name=data.get("nodenm"),
+            station_no=_optional_str(data.get("nodeno")),
+            node_order=_optional_int(data.get("nodeord")),
+            gps_latitude=_optional_float(data.get("gpslati")),
+            gps_longitude=_optional_float(data.get("gpslong")),
+            arrival_time=_optional_int(data.get("arrtime")),
+            previous_station_count=_optional_int(data.get("arrprevstationcnt")),
+            vehicle_type=data.get("vehicletp"),
+            vehicle_no=data.get("vehicleno"),
+        )
 
-    @property
-    def station_no(self) -> int:
-        return self.nodeNo
 
-    @property
-    def gps_lati(self) -> float:
-        return self.gpsLati
+def _optional_float(value: Any) -> float | None:
+    if value is None or value == "":
+        return None
+    return float(value)
 
-    @property
-    def gps_long(self) -> float:
-        return self.gpsLong
-    
-    # @classmethod
-    # def from_list(cls, data: list[dict]) -> list["Vehicle"]:
-    #     return [ cls.from_dict(vehicle) for vehicle in data]
+
+def _optional_str(value: Any) -> str | None:
+    if value is None or value == "":
+        return None
+    return str(value)
+
+
+def _optional_int(value: Any) -> int | None:
+    if value is None or value == "":
+        return None
+    return int(value)
