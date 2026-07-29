@@ -2,18 +2,37 @@ import httpx
 import xmltodict
 
 from tagoapi.exceptions import (
-    RequestExcessdsError,
+    NoOpenAPIServiceError,
+    OpenAPIApplicationError,
+    OpenAPIHTTPError,
+    RequestLimitExceededError,
     ServiceAccessDeniedError,
     ServiceKeyNotRegisteredError,
+    TagoDecodeError,
+    TagoHTTPStatusError,
+    TagoOpenAPIError,
     TagoRequestTimeoutError,
+    TagoServiceError,
     TagoTransportError,
-    NoOpenAPIServiceError,
-    UnRegisteredIpError,
-    DeadLineHasExpired,
+    UnknownOpenAPIError,
+    UnregisteredIPError,
+    UsagePeriodExpiredError,
 )
 
 
 class HttpTransport:
+    _OPEN_API_ERRORS = {
+        "1": OpenAPIApplicationError,
+        "4": OpenAPIHTTPError,
+        "12": NoOpenAPIServiceError,
+        "20": ServiceAccessDeniedError,
+        "22": RequestLimitExceededError,
+        "30": ServiceKeyNotRegisteredError,
+        "31": UsagePeriodExpiredError,
+        "32": UnregisteredIPError,
+        "99": UnknownOpenAPIError,
+    }
+
     def __init__(
             self,
             *,
@@ -54,7 +73,7 @@ class HttpTransport:
     def _raise_for_status(self, response: httpx.Response) -> None:
         status = response.status_code
         if status >= 400:
-            raise TagoTransportError(f"HTTP 오류 발생: {status}")
+            raise TagoHTTPStatusError(status)
 
     def _parse_response(self, response: httpx.Response) -> dict:
         payload = self._parse_payload(response)
@@ -63,7 +82,10 @@ class HttpTransport:
 
     def _parse_payload(self, response: httpx.Response) -> dict:
         try:
-            return response.json()
+            payload = response.json()
+            if not isinstance(payload, dict):
+                raise TagoDecodeError("TAGO 응답 최상위 값은 객체여야 합니다.")
+            return payload
         except ValueError as exc:
             try:
                 parsed_xml = xmltodict.parse(response.text)
@@ -72,7 +94,9 @@ class HttpTransport:
                     return open_api_error.get("cmmMsgHeader", open_api_error)
                 return parsed_xml
             except Exception as parse_exc:
-                raise ValueError("응답을 JSON으로 디코딩 할 수 없습니다.") from parse_exc
+                raise TagoDecodeError(
+                    "TAGO 응답을 JSON 또는 XML로 디코딩할 수 없습니다."
+                ) from parse_exc
 
     def _raise_for_return_reason(self, payload: dict) -> None:
         error_code = payload.get("returnReasonCode")
@@ -82,25 +106,16 @@ class HttpTransport:
                 response_code = header.get("resultCode")
                 response_msg = header.get("resultMsg")
                 if response_code and str(response_code) != "00":
-                    raise TagoTransportError(f"응답 오류: {response_code} {response_msg}")
+                    raise TagoServiceError(
+                        str(response_code),
+                        None if response_msg is None else str(response_msg),
+                    )
             return
 
         error_code = str(error_code)
-
-        if error_code == "4":
-            raise TagoTransportError("HTTP 에러가 발생했습니다.")
-        if error_code == "12":
-            raise NoOpenAPIServiceError("해당 오픈 API 서비스가 없거나 폐기된 서비스입니다.")
-        if error_code == "20":
-            raise ServiceAccessDeniedError("서비스에 접근이 거부되었습니다.")
-        if error_code == "22":
-            raise RequestExcessdsError("서비스 요청제한횟수를 초과했습니다.")
-        if error_code == "30":
-            raise ServiceKeyNotRegisteredError("유효하지 않는 서비스키 입니다.")
-        if error_code == "31":
-            raise DeadLineHasExpired("API활용기간이 만료되었습니다.")
-        if error_code == "32":
-            raise UnRegisteredIpError("등록되지 않은 IP입니다.")
-        if error_code == "99":
-            raise TagoTransportError("요청 파라미터가 잘못되었습니다.")
-        raise RuntimeError(f"실행중 오류가 발생했습니다. 에러코드: {error_code}")
+        error_type = self._OPEN_API_ERRORS.get(error_code, TagoOpenAPIError)
+        detail = payload.get("returnAuthMsg") or payload.get("errMsg")
+        raise error_type(
+            error_code,
+            None if detail is None else str(detail),
+        )

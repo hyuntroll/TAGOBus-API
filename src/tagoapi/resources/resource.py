@@ -1,7 +1,11 @@
 from collections.abc import Mapping
 from typing import Any, Protocol, TypeVar
 
-from tagoapi.exceptions import TagoResponseError, TagoServiceError
+from tagoapi.exceptions import (
+    InvalidRequestParameterError,
+    TagoResponseError,
+    TagoServiceError,
+)
 from tagoapi.models.base_model import BaseModel
 
 from .page import TagoPage
@@ -136,7 +140,12 @@ class TagoResource:
         normalized_code = str(result_code).zfill(2)
         if normalized_code != "00":
             result_message = header.get("resultMsg")
-            raise TagoServiceError(
+            error_type = (
+                InvalidRequestParameterError
+                if normalized_code == "99"
+                else TagoServiceError
+            )
+            raise error_type(
                 normalized_code,
                 None if result_message is None else str(result_message),
             )

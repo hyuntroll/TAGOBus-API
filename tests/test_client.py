@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock
 
+import pytest
+
 from tagoapi import TAGOClient
 from tagoapi.models import Route, Station
 from tagoapi.resources import (
@@ -31,7 +33,11 @@ def test_legacy_route_method_delegates_without_cache():
     client.routes.list.return_value = TagoPage([route], 1, 10, 1)
 
     try:
-        result = client.get_route_by_no(cityCode=25, routeNo="100")
+        with pytest.warns(
+            DeprecationWarning,
+            match=r"TAGOClient\.routes\.list",
+        ):
+            result = client.get_route_by_no(cityCode=25, routeNo="100")
     finally:
         client.close()
 
@@ -46,11 +52,15 @@ def test_legacy_station_method_maps_aliases():
     client.stations.list.return_value = TagoPage([station], 1, 10, 1)
 
     try:
-        result = client.get_station(
-            cityCode=25,
-            nodeNo="1001",
-            nodeNm="중앙역",
-        )
+        with pytest.warns(
+            DeprecationWarning,
+            match=r"TAGOClient\.stations\.list",
+        ):
+            result = client.get_station(
+                cityCode=25,
+                nodeNo="1001",
+                nodeNm="중앙역",
+            )
     finally:
         client.close()
 
@@ -60,3 +70,21 @@ def test_legacy_station_method_maps_aliases():
         station_no="1001",
         station_name="중앙역",
     )
+
+
+def test_all_legacy_client_methods_are_marked_deprecated():
+    legacy_methods = [
+        "get_route_by_no",
+        "get_route_by_id",
+        "get_route_by_station",
+        "get_station_by_route",
+        "get_station",
+        "get_station_by_gps",
+        "get_arrival_by_station",
+        "get_route_arrival_by_station",
+        "get_route_pos",
+        "get_route_pos_near_station",
+    ]
+
+    for method_name in legacy_methods:
+        assert hasattr(getattr(TAGOClient, method_name), "__wrapped__")

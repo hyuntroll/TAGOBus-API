@@ -86,12 +86,7 @@ for city in cities:
 ~~~python
 obj.to_dict()             # 객체 → dict 변환
 BaseModel.from_dict(dict) # dict → 객체 변환
-BaseModel.from_list(list) # dict 리스트 → 객체 리스트 변환
 ~~~
-
-### **BaseList**
-도메인 객체들을 요소로 갖는 list 입니다.
-기본적으로 Python의 기본 자료형인 list를 상속 받습니다.
 
 ### **Station**
 | 필드명        | 타입                | 설명                     |
@@ -104,7 +99,7 @@ BaseModel.from_list(list) # dict 리스트 → 객체 리스트 변환
 | `cityCode` | `int`             | 도시코드                   |
 | `updowncd` | `int`             | 상하행구분코드 (`0`: 상행, `1`: 하행) |
 | `nodeord`  | `int`             | 정류소순번                  |
-| `routes`   | `BaseList[Route]` | 정류소를 경유하는 노선           |
+| `routes`   | `list[Route]`     | 정류소를 경유하는 노선           |
 
 
 ### **Route**
@@ -117,7 +112,7 @@ BaseModel.from_list(list) # dict 리스트 → 객체 리스트 변환
 | `startNodeNm`      | `str`               | 기점           |
 | `endvehicletime`   | `int`               | 막차시간         |
 | `startvehicletime` | `int`               | 첫차시간         |
-| `stations`         | `BaseList[Station]` | 노선이 경유하는 정류소 |
+| `stations`         | `list[Station]`     | 노선이 경유하는 정류소 |
 
 
 ### **ArrivalInfo**
@@ -142,21 +137,44 @@ BaseModel.from_list(list) # dict 리스트 → 객체 리스트 변환
 
 
 
-## 지원 API 목록
+## 지원 Resource API
 
-| 메서드 | 설명 | 매개변수 |
-|--------|------|----------|
-| `get_route_by_no` | 버스 노선 번호로 조회 | `cityCode`, `routeNo` |
-| `get_route_by_id` | 노선 ID로 정보 조회 | `cityCode`, `routeId` |
-| `get_route_by_station` | 정류소 경유 노선 조회 | `cityCode`, `nodeId` |
-| `get_station_by_route` | 노선 경유 정류소 조회 | `cityCode`, `routeId` |
-| `get_station` | 정류소명 또는 번호로 조회 | `cityCode`, `nodeNm` (선택: `nodeNo`) |
-| `get_station_by_gps` | GPS 좌표 기반 주변 정류소 조회 | `gpsLati`, `gpsLong` |
-| `get_arrival_by_station` | 실시간 도착예정정보 및 운행정보 목록을 조회 | `cityCode`, `nodeId` |
-| `get_route_arrival_by_station` | 특정노선의 실시간 도착예정정보 및 운행정보 목록을 조회 | `cityCode`, `nodeId`, `routeId` |
-| `get_route_pos` | 버스의 GPS위치정보의 목록을 조회 | `cityCode`, `routeId` |
-| `get_route_pos_near_station` | 특정정류소에 접근한 버스의 GPS위치정보를 조회 | `cityCode`, `routeId`, `nodeId` |
+| Resource 메서드 | 설명 |
+|---|---|
+| `client.cities.list()` | 서비스 가능 도시 조회 |
+| `client.routes.list()` | 도시 및 노선번호로 노선 조회 |
+| `client.routes.get()` | 노선 ID로 상세 조회 |
+| `client.routes.list_stations()` | 노선 경유 정류소 조회 |
+| `client.stations.list()` | 도시, 정류소명 또는 번호로 조회 |
+| `client.stations.list_nearby()` | GPS 좌표 기반 주변 정류소 조회 |
+| `client.stations.list_routes()` | 정류소 경유 노선 조회 |
+| `client.arrivals.list_by_station()` | 정류소 도착예정정보 조회 |
+| `client.arrivals.list_by_station_and_route()` | 정류소의 특정 노선 도착정보 조회 |
+| `client.vehicles.list_by_route()` | 노선별 버스 위치 조회 |
+| `client.vehicles.list_approaching_station()` | 특정 정류소 접근 버스 조회 |
+
+기존 `client.get_route_by_no()` 등의 메서드는 호환성을 위해 유지되지만
+`DeprecationWarning`을 발생시키며 1.0에서 제거될 예정입니다.
+
+## 예외 처리
+
+```python
+from tagoapi.exceptions import (
+    RequestLimitExceededError,
+    ServiceKeyNotRegisteredError,
+    TagoAPIError,
+)
+
+try:
+    cities = client.cities.list()
+except ServiceKeyNotRegisteredError:
+    print("서비스 키를 확인해주세요.")
+except RequestLimitExceededError:
+    print("요청 제한 횟수를 초과했습니다.")
+except TagoAPIError as error:
+    print(error)
+```
 
 ---
-### 5. 오류 및 이슈
+### 오류 및 이슈
 버그 제보 또는 기능 요청은 [GitHub 이슈](https://github.com/hyuntroll/TAGOBus-API/issues)에 등록해주세요.

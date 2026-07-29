@@ -2,7 +2,11 @@ from typing import Any, Mapping
 
 import pytest
 
-from tagoapi.exceptions import TagoResponseError, TagoServiceError
+from tagoapi.exceptions import (
+    InvalidRequestParameterError,
+    TagoResponseError,
+    TagoServiceError,
+)
 from tagoapi.models.base_model import BaseModel
 from tagoapi.resources.resource import TagoResource
 
@@ -105,7 +109,7 @@ def test_resource_raises_service_and_shape_errors():
             "body": {"items": {}},
         }
     }
-    with pytest.raises(TagoServiceError) as exc_info:
+    with pytest.raises(InvalidRequestParameterError) as exc_info:
         ExampleResource(FakeTransport(service_error))._request_page(
             "/list",
             {},

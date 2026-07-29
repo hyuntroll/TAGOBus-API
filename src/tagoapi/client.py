@@ -1,4 +1,6 @@
-from typing import Any
+from functools import wraps
+from typing import Any, Callable, ParamSpec, TypeVar
+import warnings
 
 from ._internal import HttpTransport
 from .models import ArrivalInfo, Route, Station, Vehicle
@@ -9,6 +11,30 @@ from .resources import (
     StationResource,
     VehicleResource,
 )
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def _deprecated(
+    replacement: str,
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def decorator(method: Callable[P, R]) -> Callable[P, R]:
+        @wraps(method)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            warnings.warn(
+                f"{method.__qualname__}() is deprecated; "
+                f"use TAGOClient.{replacement}() instead. "
+                "It will be removed in version 1.0.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return method(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 class TAGOClient:
@@ -39,7 +65,8 @@ class TAGOClient:
     def close(self) -> None:
         self._transport.close()
 
-    # 기존 공개 메서드는 cache 없이 새 Resource로 위임한다.
+    # 기존 공개 메서드는 1.0까지 새 Resource로 위임한다.
+    @_deprecated("routes.list")
     def get_route_by_no(
         self,
         city_code: int | None = None,
@@ -55,6 +82,7 @@ class TAGOClient:
             normalized_route_no,
         ).items
 
+    @_deprecated("routes.get")
     def get_route_by_id(
         self,
         city_code: int | None = None,
@@ -68,6 +96,7 @@ class TAGOClient:
             self._coalesce(route_id, routeId),
         )
 
+    @_deprecated("stations.list_routes")
     def get_route_by_station(
         self,
         city_code: int | None = None,
@@ -81,6 +110,7 @@ class TAGOClient:
             self._coalesce(station_id, nodeId),
         ).items
 
+    @_deprecated("routes.list_stations")
     def get_station_by_route(
         self,
         city_code: int | None = None,
@@ -94,6 +124,7 @@ class TAGOClient:
             self._coalesce(route_id, routeId),
         ).items
 
+    @_deprecated("stations.list")
     def get_station(
         self,
         city_code: int | None = None,
@@ -110,6 +141,7 @@ class TAGOClient:
             station_name=self._coalesce(station_name, nodeNm),
         ).items
 
+    @_deprecated("stations.list_nearby")
     def get_station_by_gps(
         self,
         gps_lati: float | None = None,
@@ -123,6 +155,7 @@ class TAGOClient:
             self._coalesce(gps_long, gpsLong),
         ).items
 
+    @_deprecated("arrivals.list_by_station")
     def get_arrival_by_station(
         self,
         city_code: int | None = None,
@@ -137,6 +170,7 @@ class TAGOClient:
             self._coalesce(station_id, node_id, nodeId),
         ).items
 
+    @_deprecated("arrivals.list_by_station_and_route")
     def get_route_arrival_by_station(
         self,
         city_code: int | None = None,
@@ -154,6 +188,7 @@ class TAGOClient:
             self._coalesce(route_id, routeId),
         ).items
 
+    @_deprecated("vehicles.list_by_route")
     def get_route_pos(
         self,
         city_code: int | None = None,
@@ -167,6 +202,7 @@ class TAGOClient:
             self._coalesce(route_id, routeId),
         ).items
 
+    @_deprecated("vehicles.list_approaching_station")
     def get_route_pos_near_station(
         self,
         city_code: int | None = None,
