@@ -8,4 +8,4 @@ def test_package_version_uses_three_part_semver():
 
 
 def test_current_package_version():
-    assert __version__ == "0.13.0"
+    assert __version__ == "0.14.0"

@@ -2,6 +2,16 @@
 
 이 프로젝트는 `MAJOR.MINOR.PATCH` 버전 형식을 사용합니다.
 
+## 0.14.0 - Unreleased
+
+### Added
+
+- 공식 정류소 데이터 기반 오프라인 `StationCatalog`
+
+### Changed
+
+- 패키지 빌드 설정을 `pyproject.toml`로 전환
+
 ## 0.13.0 - 2026-07-29
 
 ### Added

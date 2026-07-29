@@ -18,7 +18,7 @@
 - `MINOR`: 하위 호환되는 기능 추가 및 deprecation
 - `PATCH`: 하위 호환되는 버그 수정
 
-현재 개발 버전은 `0.13.0`입니다. Deprecated Client 메서드와 기존 예외
+현재 개발 버전은 `0.14.0`입니다. Deprecated Client 메서드와 기존 예외
 alias는 `1.0.0`에서 제거할 예정입니다.
 
 ```bash
