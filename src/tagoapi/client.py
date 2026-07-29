@@ -26,7 +26,7 @@ def _deprecated(
             warnings.warn(
                 f"{method.__qualname__}() is deprecated; "
                 f"use TAGOClient.{replacement}() instead. "
-                "It will be removed in version 1.0.",
+                "It will be removed in version 1.0.0.",
                 DeprecationWarning,
                 stacklevel=2,
             )
@@ -65,7 +65,7 @@ class TAGOClient:
     def close(self) -> None:
         self._transport.close()
 
-    # 기존 공개 메서드는 1.0까지 새 Resource로 위임한다.
+    # 기존 공개 메서드는 1.0.0까지 새 Resource로 위임한다.
     @_deprecated("routes.list")
     def get_route_by_no(
         self,

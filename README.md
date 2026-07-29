@@ -10,6 +10,17 @@
 
 `Unoffical-TAGO-API` 는 python 3.10 이상의 버전을 지원합니다. (추후 3.10 이하 버전도 지원할 예정입니다.)
 
+## 버전 정책
+
+버전은 `MAJOR.MINOR.PATCH` 형식을 사용합니다.
+
+- `MAJOR`: 하위 호환되지 않는 공개 API 변경
+- `MINOR`: 하위 호환되는 기능 추가 및 deprecation
+- `PATCH`: 하위 호환되는 버그 수정
+
+현재 개발 버전은 `0.13.0`입니다. Deprecated Client 메서드와 기존 예외
+alias는 `1.0.0`에서 제거할 예정입니다.
+
 ```bash
 pip install Unoffical-TAGO-API
 ```
@@ -154,7 +165,7 @@ BaseModel.from_dict(dict) # dict → 객체 변환
 | `client.vehicles.list_approaching_station()` | 특정 정류소 접근 버스 조회 |
 
 기존 `client.get_route_by_no()` 등의 메서드는 호환성을 위해 유지되지만
-`DeprecationWarning`을 발생시키며 1.0에서 제거될 예정입니다.
+`DeprecationWarning`을 발생시키며 1.0.0에서 제거될 예정입니다.
 
 ## 예외 처리
 
