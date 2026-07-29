@@ -226,11 +226,6 @@ class TAGOClient:
             self._coalesce(station_id, node_id, nodeId),
         ).items
 
-    def _get(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
-        """이전 테스트 및 확장 코드를 위한 Transport 위임 메서드."""
-        path = endpoint if endpoint.startswith("/") else f"/{endpoint}"
-        return self._transport.request(path, params=params)
-
     @staticmethod
     def _coalesce(*values: Any) -> Any:
         for value in values:
