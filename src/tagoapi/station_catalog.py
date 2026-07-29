@@ -1,56 +1,28 @@
 from collections import defaultdict
-from contextlib import contextmanager
 import csv
+from dataclasses import dataclass, field
 import gzip
 from importlib import resources
-from pathlib import Path
-from typing import Iterator, Mapping, TextIO
 
 from .exceptions import StationCatalogError
 from .models import Station
 
 
 _DATA_FILE = "stations_2025_06_15.csv.gz"
-_REQUIRED_COLUMNS = frozenset(
-    {
-        "정류장번호",
-        "정류장명",
-        "위도",
-        "경도",
-        "모바일단축번호",
-        "도시코드",
-    }
-)
 
 
+@dataclass(slots=True)
 class _StationRecord:
-    __slots__ = (
-        "station_id",
-        "station_name",
-        "normalized_name",
-        "station_no",
-        "gps_latitude",
-        "gps_longitude",
-        "city_code",
-    )
+    station_id: str
+    station_name: str
+    station_no: str | None
+    gps_latitude: float | None
+    gps_longitude: float | None
+    city_code: int
+    normalized_name: str = field(init=False)
 
-    def __init__(
-        self,
-        *,
-        station_id: str,
-        station_name: str,
-        station_no: str | None,
-        gps_latitude: float | None,
-        gps_longitude: float | None,
-        city_code: int,
-    ) -> None:
-        self.station_id = station_id
-        self.station_name = station_name
-        self.normalized_name = station_name.casefold()
-        self.station_no = station_no
-        self.gps_latitude = gps_latitude
-        self.gps_longitude = gps_longitude
-        self.city_code = city_code
+    def __post_init__(self) -> None:
+        self.normalized_name = self.station_name.casefold()
 
     def to_station(self) -> Station:
         return Station(
@@ -70,7 +42,6 @@ class StationCatalog:
     information_date = "2024-10-28"
 
     def __init__(self) -> None:
-        self._data_path: Path | None = None
         self._records: tuple[_StationRecord, ...] | None = None
         self._station_id_index: dict[str, int] = {}
         self._city_index: dict[int, tuple[int, ...]] = {}
@@ -125,12 +96,6 @@ class StationCatalog:
         self._ensure_loaded()
         return len(self._loaded_records())
 
-    @classmethod
-    def _from_path(cls, data_path: Path) -> "StationCatalog":
-        catalog = cls()
-        catalog._data_path = data_path
-        return catalog
-
     def _ensure_loaded(self) -> None:
         if self._records is not None:
             return
@@ -140,30 +105,24 @@ class StationCatalog:
         city_index: defaultdict[int, list[int]] = defaultdict(list)
 
         try:
-            with self._open_data() as stream:
+            data_file = resources.files("tagoapi.data").joinpath(_DATA_FILE)
+            with (
+                data_file.open("rb") as compressed_stream,
+                gzip.open(
+                    compressed_stream,
+                    mode="rt",
+                    encoding="cp949",
+                    newline="",
+                ) as stream,
+            ):
                 reader = csv.DictReader(stream)
-                columns = frozenset(reader.fieldnames or ())
-                missing_columns = _REQUIRED_COLUMNS - columns
-                if missing_columns:
-                    names = ", ".join(sorted(missing_columns))
-                    raise StationCatalogError(
-                        f"정류소 데이터에 필수 컬럼이 없습니다: {names}"
-                    )
-
-                for row_number, row in enumerate(reader, start=2):
-                    record = self._parse_record(row, row_number)
-                    if record.station_id in station_id_index:
-                        raise StationCatalogError(
-                            f"{row_number}행의 정류장번호가 중복되었습니다: "
-                            f"{record.station_id}"
-                        )
+                for row in reader:
+                    record = self._parse_record(row)
                     index = len(records)
                     records.append(record)
                     station_id_index[record.station_id] = index
                     city_index[record.city_code].append(index)
-        except StationCatalogError:
-            raise
-        except (OSError, UnicodeError, csv.Error) as exc:
+        except (OSError, UnicodeError, csv.Error, KeyError, ValueError) as exc:
             raise StationCatalogError(
                 "정류소 데이터를 읽을 수 없습니다."
             ) from exc
@@ -175,63 +134,18 @@ class StationCatalog:
             for city_code, indices in city_index.items()
         }
 
-    @contextmanager
-    def _open_data(self) -> Iterator[TextIO]:
-        if self._data_path is not None:
-            with gzip.open(
-                self._data_path,
-                mode="rt",
-                encoding="cp949",
-                newline="",
-            ) as stream:
-                yield stream
-            return
-
-        data_file = resources.files("tagoapi.data").joinpath(_DATA_FILE)
-        with (
-            data_file.open("rb") as compressed_stream,
-            gzip.open(
-                compressed_stream,
-                mode="rt",
-                encoding="cp949",
-                newline="",
-            ) as stream,
-        ):
-            yield stream
-
     @staticmethod
-    def _parse_record(
-        row: Mapping[str, str | None],
-        row_number: int,
-    ) -> _StationRecord:
+    def _parse_record(row: dict[str, str | None]) -> _StationRecord:
         station_id = (row.get("정류장번호") or "").strip()
         station_name = (row.get("정류장명") or "").strip()
-        if not station_id:
-            raise StationCatalogError(
-                f"{row_number}행의 정류장번호가 비어 있습니다."
-            )
-        if not station_name:
-            raise StationCatalogError(
-                f"{row_number}행의 정류장명이 비어 있습니다."
-            )
-
-        try:
-            city_code = int((row.get("도시코드") or "").strip())
-            gps_latitude = _optional_float(row.get("위도"))
-            gps_longitude = _optional_float(row.get("경도"))
-        except ValueError as exc:
-            raise StationCatalogError(
-                f"{row_number}행에 잘못된 숫자 값이 있습니다."
-            ) from exc
-
         station_no = (row.get("모바일단축번호") or "").strip() or None
         return _StationRecord(
             station_id=station_id,
             station_name=station_name,
             station_no=station_no,
-            gps_latitude=gps_latitude,
-            gps_longitude=gps_longitude,
-            city_code=city_code,
+            gps_latitude=_optional_float(row.get("위도")),
+            gps_longitude=_optional_float(row.get("경도")),
+            city_code=int((row.get("도시코드") or "").strip()),
         )
 
     def _loaded_records(self) -> tuple[_StationRecord, ...]:
