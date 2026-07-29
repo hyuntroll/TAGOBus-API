@@ -1,6 +1,7 @@
-from tagoapi.models import ArrivalInfo, Route, Station, Vehicle
+from tagoapi.models import ArrivalInfo, CityCode, Route, Station, Vehicle
 from tagoapi.resources import (
     ArrivalResource,
+    CityResource,
     RouteResource,
     StationResource,
     VehicleResource,
@@ -233,3 +234,37 @@ def test_vehicle_approaching_station_injects_route_and_station_ids():
         "/getRouteAcctoSpcifySttnAccesBusLcInfo"
     )
     assert transport.calls[0]["params"]["nodeId"] == "N1"
+
+
+def test_city_resource_maps_non_paginated_city_list():
+    transport = FakeTransport([
+        {"citycode": "22", "cityname": "대구광역시"},
+        {"citycode": 25, "cityname": "대전광역시"},
+    ])
+    body = transport.response["response"]["body"]
+    body.pop("pageNo")
+    body.pop("numOfRows")
+    body.pop("totalCount")
+
+    cities = CityResource(transport).list()
+
+    assert all(isinstance(city, CityCode) for city in cities)
+    assert [(city.city_code, city.city_name) for city in cities] == [
+        (22, "대구광역시"),
+        (25, "대전광역시"),
+    ]
+    assert transport.calls[0] == {
+        "path": "/BusRouteInfoInqireService/getCtyCodeList",
+        "params": {"_type": "json"},
+    }
+
+
+def test_city_resource_normalizes_single_and_empty_items():
+    single_transport = FakeTransport({
+        "citycode": "22",
+        "cityname": "대구광역시",
+    })
+    assert len(CityResource(single_transport).list()) == 1
+
+    empty_transport = FakeTransport(None)
+    assert CityResource(empty_transport).list() == []

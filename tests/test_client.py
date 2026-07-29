@@ -4,6 +4,7 @@ from tagoapi import TAGOClient
 from tagoapi.models import Route, Station
 from tagoapi.resources import (
     ArrivalResource,
+    CityResource,
     RouteResource,
     StationResource,
     TagoPage,
@@ -18,6 +19,7 @@ def test_client_composes_all_resources():
         assert isinstance(client.stations, StationResource)
         assert isinstance(client.arrivals, ArrivalResource)
         assert isinstance(client.vehicles, VehicleResource)
+        assert isinstance(client.cities, CityResource)
     finally:
         client.close()
 

@@ -4,6 +4,7 @@ from ._internal import HttpTransport
 from .models import ArrivalInfo, Route, Station, Vehicle
 from .resources import (
     ArrivalResource,
+    CityResource,
     RouteResource,
     StationResource,
     VehicleResource,
@@ -27,6 +28,7 @@ class TAGOClient:
         self.stations = StationResource(self._transport)
         self.arrivals = ArrivalResource(self._transport)
         self.vehicles = VehicleResource(self._transport)
+        self.cities = CityResource(self._transport)
 
     def __enter__(self) -> "TAGOClient":
         return self

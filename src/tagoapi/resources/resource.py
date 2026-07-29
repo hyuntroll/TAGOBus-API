@@ -65,6 +65,21 @@ class TagoResource:
             ),
         )
 
+    def _request_many(
+        self,
+        path: str,
+        params: dict[str, Any],
+        *,
+        model: type[ModelT],
+        context: Mapping[str, Any] | None = None,
+    ) -> list[ModelT]:
+        _, body = self._request_body(path, params)
+        rows = self._normalize_items(self._extract_items(body))
+        return [
+            model.from_dict(self._apply_context(row, context))
+            for row in rows
+        ]
+
     def _request_one(
         self,
         path: str,

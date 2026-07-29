@@ -53,23 +53,21 @@ from tagoapi import TAGOClient
 
 client = TAGOClient(service_key="YOUR_SERVICE_KEY")
 ```
----
 
-### 2. 정류장 검색 (로컬 함수)
-클라이언트를 사용하지 않고도 **지역 기반 정류장 검색**이 가능합니다.
+### 2. 서비스 가능 도시 조회
 
 ```python
-from tagoapi import get_station
+cities = client.cities.list()
 
-stations = get_station("대구")
-print(stations)
+for city in cities:
+    print(city.city_code, city.city_name)
 ```
 
 ---
 
 ### 3. 도메인 클래스
 
-모든 메서드와 `get_station` 함수는 다음과 같은 **도메인 객체**를 반환합니다.
+클라이언트와 Resource는 다음과 같은 **도메인 객체**를 반환합니다.
 
 - `Station` : 정류소 정보  
 - `Vehicle` : 버스 차량 정보  

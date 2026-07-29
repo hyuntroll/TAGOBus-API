@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from tagoapi.models import ArrivalInfo, Route, Station, Vehicle
+from tagoapi.models import ArrivalInfo, CityCode, Route, Station, Vehicle
 
 
 def test_route_maps_flat_payload_and_loads_detail_group_once():
@@ -90,3 +90,17 @@ def test_vehicle_maps_flat_payload_and_lazy_loads_relations():
     assert vehicle.station is station
     assert vehicle.gps_latitude == 35.2
     assert vehicle.gps_longitude == 128.2
+
+
+def test_city_code_maps_documented_payload():
+    city = CityCode.from_dict({
+        "citycode": "22",
+        "cityname": "대구광역시",
+    })
+
+    assert city.city_code == 22
+    assert city.city_name == "대구광역시"
+    assert city.to_dict() == {
+        "city_code": 22,
+        "city_name": "대구광역시",
+    }
