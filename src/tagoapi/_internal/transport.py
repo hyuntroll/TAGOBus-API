@@ -72,19 +72,8 @@ class HttpTransport:
                 "API 서버와 통신하지 못했습니다."
             ) from exc
 
-        self._raise_for_status(response)
-
-        return self._parse_response(response)
-
-    def _raise_for_status(self, response: httpx.Response) -> None:
-        status = response.status_code
-        if status >= 400:
-            raise TagoHTTPStatusError(status)
-
-    def _parse_response(
-        self,
-        response: httpx.Response,
-    ) -> dict[str, Any]:
+        if response.status_code >= 400:
+            raise TagoHTTPStatusError(response.status_code)
         payload = self._parse_payload(response)
         self._raise_for_return_reason(payload)
         return payload
