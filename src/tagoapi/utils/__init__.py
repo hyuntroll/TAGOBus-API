@@ -1,18 +1,4 @@
-from .convertor import convert
+"""Local data utilities.
 
-from .params import *
-
-from .get import http_get
-
-# from .get_station import get_station
-
-
-
-__all__ = [
-    "parse_metadata",
-    "convert",
-    "build_params",
-    "cache",
-    "http_get",
-    "KeyExtract"
-]
+정류소 CSV 검색은 추후 StationCatalog로 제공한다.
+"""

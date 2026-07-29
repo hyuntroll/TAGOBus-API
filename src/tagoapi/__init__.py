@@ -1,5 +1,5 @@
 from .client import TAGOClient
-from .models import ArrivalInfo, BaseList, BaseModel, Route, Station, Vehicle
+from .models import ArrivalInfo, BaseModel, Route, Station, Vehicle
 from .resources import (
     ArrivalResource,
     RouteResource,
@@ -11,7 +11,6 @@ from .resources import (
 __all__ = [
     "TAGOClient",
     "BaseModel",
-    "BaseList",
     "Route",
     "Vehicle",
     "Station",

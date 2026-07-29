@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import MagicMock
 
 from src.tagoapi.models import Route, Station
-from src.tagoapi.models.base_list import BaseList
 
 class TestRoute(unittest.TestCase):
     def setUp(self):
@@ -55,12 +54,12 @@ class TestRoute(unittest.TestCase):
         route = CustomRoute("564", city_code=22, route_no="북구2")
 
         mock_client = MagicMock()
-        mock_client.get_stations.return_value = BaseList([
+        mock_client.get_stations.return_value = [
             Station("안녕하시귀", "이런다"),
             Station("안녕하시귀", "이런다1"),
             Station("안녕하시귀", "이런다2"),
             Station("안녕하시귀", "이런다3")
-        ])
+        ]
 
         route.bind_client(mock_client)
 
@@ -73,12 +72,12 @@ class TestRoute(unittest.TestCase):
         route = Route("564", city_code=22, route_no="북구2")
 
         mock_client = MagicMock()
-        mock_client._get_stations_by_route.return_value = BaseList([
+        mock_client._get_stations_by_route.return_value = [
             Station("안녕하시귀", "이런다"),
             Station("안녕하시귀", "이런다1"),
             Station("안녕하시귀", "이런다2"),
             Station("안녕하시귀", "이런다3")
-        ])
+        ]
 
         route.bind_client(mock_client)
 
