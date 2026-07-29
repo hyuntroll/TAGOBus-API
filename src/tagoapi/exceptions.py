@@ -2,6 +2,10 @@ class TagoAPIError(Exception):
     """모든 TAGO API 예외의 기반 클래스."""
 
 
+class StationCatalogError(TagoAPIError):
+    """내장 정류소 데이터를 읽거나 변환하지 못한 경우."""
+
+
 class TagoTransportError(TagoAPIError):
     """HTTP 통신 또는 응답 디코딩 실패."""
 
@@ -126,6 +130,7 @@ UnRegisteredIpError = UnregisteredIPError
 
 __all__ = [
     "TagoAPIError",
+    "StationCatalogError",
     "TagoTransportError",
     "TagoRequestTimeoutError",
     "TagoHTTPStatusError",

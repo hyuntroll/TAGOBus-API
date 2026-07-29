@@ -95,6 +95,33 @@ for station in stations:
     print(station.station_id, station.station_name)
 ```
 
+### 4. 오프라인 정류소 검색
+
+`StationCatalog`는 패키지에 포함된 공식 정류소 스냅샷을 사용하므로 서비스
+키나 네트워크 호출 없이 검색할 수 있습니다.
+
+```python
+from tagoapi import StationCatalog
+
+catalog = StationCatalog()
+
+stations = catalog.search("중앙역", city_code=25)
+station = catalog.get("DJB8001793")
+```
+
+- `search(keyword, city_code=None, limit=100)`은 정류소 이름의 부분 일치
+  결과를 원본 데이터 순서로 반환합니다.
+- `limit=None`을 지정하면 일치하는 결과를 모두 반환합니다.
+- `get(station_id)`은 정류소 ID가 없으면 `None`을 반환합니다.
+- 데이터는 첫 조회 때 메모리에 읽히며 같은 인스턴스의 이후 조회에서
+  재사용됩니다.
+
+내장 데이터는 공공데이터포털의
+[국토교통부_전국 버스정류장 위치정보](https://www.data.go.kr/data/15067528/fileData.do)
+파일을 기반으로 합니다. 스냅샷 파일 기준일은 2025-06-15이고 CSV의
+정보수집일은 2024-10-28입니다. 원본 데이터는 연간 갱신되므로 최신 변경이
+즉시 반영되지 않을 수 있습니다.
+
 목록 Resource는 `TagoPage`를 반환합니다.
 
 ```python
@@ -106,7 +133,7 @@ page.total_count  # 전체 결과 수
 
 `TagoPage`는 반복과 `len()`을 지원하므로 모델 목록처럼 순회할 수 있습니다.
 
-### 4. 도메인 클래스
+### 5. 도메인 클래스
 
 클라이언트와 Resource는 다음과 같은 **도메인 객체**를 반환합니다.
 

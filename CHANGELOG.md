@@ -7,10 +7,15 @@
 ### Added
 
 - 공식 정류소 데이터 기반 오프라인 `StationCatalog`
+- `StationCatalogError`
 
 ### Changed
 
 - 패키지 빌드 설정을 `pyproject.toml`로 전환
+
+### Removed
+
+- 구현되지 않은 `utils.get_station` 메모 모듈
 
 ## 0.13.0 - 2026-07-29
 
