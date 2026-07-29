@@ -16,6 +16,7 @@
 ### Removed
 
 - 구현되지 않은 `utils.get_station` 메모 모듈
+- Resource와 연결되지 않던 실험적 model lazy-loading 기능
 
 ## 0.13.0 - 2026-07-29
 

@@ -8,11 +8,6 @@ if TYPE_CHECKING:
 
 
 class Vehicle(BaseModel):
-    _lazy_fields = {
-        "route": "_get_route_by_vehicle",
-        "station": "_get_station_by_vehicle",
-    }
-
     def __init__(
         self,
         route_id: str,

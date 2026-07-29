@@ -4,13 +4,6 @@ from .base_model import BaseModel
 
 
 class Station(BaseModel):
-    _lazy_fields = {
-        "station_no": "_get_station",
-        "gps_latitude": "_get_station",
-        "gps_longitude": "_get_station",
-        "routes": "_get_routes_by_station",
-    }
-
     def __init__(
         self,
         station_id: str,

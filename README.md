@@ -243,13 +243,11 @@ Station.from_dict(raw) # TAGO 응답 dict → Station 변환
 기존 `client.get_route_by_no()` 등의 메서드는 호환성을 위해 유지되지만
 `DeprecationWarning`을 발생시키며 1.0.0에서 제거될 예정입니다.
 
-## Lazy field 상태
+## 관계 데이터 조회
 
-`BaseModel.bind_client()`, `load()`, `refresh()`는 기존 실험적 lazy loading
-기능을 위해 유지됩니다. 현재 Resource가 반환하는 모델에는 클라이언트가
-자동으로 바인딩되지 않으므로, 일반 사용자는 관계 조회가 필요할 때
-`client.routes`, `client.stations` 등의 Resource 메서드를 직접 호출해야
-합니다. Lazy field는 현재 안정적인 공개 API 계약에 포함되지 않습니다.
+모델의 속성 접근은 네트워크 요청을 발생시키지 않습니다. 노선의 정류소나
+정류소의 노선처럼 추가 조회가 필요한 데이터는 `client.routes`,
+`client.stations` 등의 Resource 메서드를 명시적으로 호출해야 합니다.
 
 ## 예외 처리
 

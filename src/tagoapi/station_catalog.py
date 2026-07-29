@@ -53,7 +53,7 @@ class _StationRecord:
         self.city_code = city_code
 
     def to_station(self) -> Station:
-        station = Station(
+        return Station(
             station_id=self.station_id,
             station_name=self.station_name,
             city_code=self.city_code,
@@ -61,11 +61,6 @@ class _StationRecord:
             gps_latitude=self.gps_latitude,
             gps_longitude=self.gps_longitude,
         )
-        # CSV에서 확인한 빈 값은 "미로딩"이 아니라 알려진 None 값이다.
-        station._store_lazy_value("station_no", self.station_no)
-        station._store_lazy_value("gps_latitude", self.gps_latitude)
-        station._store_lazy_value("gps_longitude", self.gps_longitude)
-        return station
 
 
 class StationCatalog:

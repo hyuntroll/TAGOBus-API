@@ -4,7 +4,7 @@ from typing import Any, Callable, ParamSpec, TypeVar
 import warnings
 
 from ._internal import HttpTransport
-from .models import ArrivalInfo, BaseModel, Route, Station, Vehicle
+from .models import ArrivalInfo, Route, Station, Vehicle
 from .resources import (
     ArrivalResource,
     CityResource,
@@ -226,74 +226,6 @@ class TAGOClient:
             self._coalesce(station_id, node_id, nodeId),
         ).items
 
-    # BaseModel lazy loading을 다시 연결할 때 사용할 기존 loader 계약.
-    def _get_route(self, route: Route) -> Route | None:
-        return self.routes.get(
-            self._require_model_city_code(route),
-            route.route_id,
-        )
-
-    def _get_stations_by_route(self, route: Route) -> list[Station]:
-        return self.routes.list_stations(
-            self._require_model_city_code(route),
-            route.route_id,
-        ).items
-
-    def _get_station(self, station: Station) -> Station | None:
-        stations = self.stations.list(
-            self._require_model_city_code(station),
-            station_no=station.station_no,
-            station_name=station.station_name,
-        ).items
-        return stations[0] if stations else None
-
-    def _get_routes_by_station(self, station: Station) -> list[Route]:
-        return self.stations.list_routes(
-            self._require_model_city_code(station),
-            station.station_id,
-        ).items
-
-    def _get_station_by_arrival_info(
-        self,
-        arrival_info: ArrivalInfo,
-    ) -> Station | None:
-        stations = self.stations.list(
-            self._require_model_city_code(arrival_info),
-            station_no=arrival_info.station_no,
-            station_name=arrival_info.station_name,
-        ).items
-        return stations[0] if stations else None
-
-    def _get_route_by_arrival_info(
-        self,
-        arrival_info: ArrivalInfo,
-    ) -> Route | None:
-        return self.routes.get(
-            self._require_model_city_code(arrival_info),
-            arrival_info.route_id,
-        )
-
-    def _get_route_by_vehicle(self, vehicle: Vehicle) -> Route | None:
-        return self.routes.get(
-            self._require_model_city_code(vehicle),
-            vehicle.route_id,
-        )
-
-    def _get_station_by_vehicle(self, vehicle: Vehicle) -> Station | None:
-        city_code = self._require_model_city_code(vehicle)
-        if vehicle.station_id:
-            stations = self.stations.list(
-                city_code,
-                station_name=vehicle.station_name,
-            ).items
-        else:
-            stations = self.stations.list(
-                city_code,
-                station_no=vehicle.station_no,
-                station_name=vehicle.station_name,
-            ).items
-        return stations[0] if stations else None
-
     def _get(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
         """이전 테스트 및 확장 코드를 위한 Transport 위임 메서드."""
         path = endpoint if endpoint.startswith("/") else f"/{endpoint}"
@@ -305,11 +237,3 @@ class TAGOClient:
             if value is not None:
                 return value
         return None
-
-    @staticmethod
-    def _require_model_city_code(model: BaseModel) -> int:
-        if model.city_code is None:
-            raise RuntimeError(
-                f"{type(model).__name__} lazy loading requires city_code"
-            )
-        return model.city_code

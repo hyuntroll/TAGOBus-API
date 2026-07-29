@@ -4,15 +4,6 @@ from .base_model import BaseModel
 
 
 class Route(BaseModel):
-    _lazy_fields = {
-        "end_vehicle_time": "_get_route",
-        "start_vehicle_time": "_get_route",
-        "interval_time": "_get_route",
-        "interval_sat_time": "_get_route",
-        "interval_sun_time": "_get_route",
-        "stations": "_get_stations_by_route",
-    }
-
     def __init__(
         self,
         route_id: str,

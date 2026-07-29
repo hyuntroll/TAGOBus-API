@@ -8,11 +8,6 @@ if TYPE_CHECKING:
 
 
 class ArrivalInfo(BaseModel):
-    _lazy_fields = {
-        "station": "_get_station_by_arrival_info",
-        "route": "_get_route_by_arrival_info",
-    }
-
     def __init__(
         self,
         station_id: str,
