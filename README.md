@@ -8,7 +8,7 @@
 
 ## 설치
 
-`Unoffical-TAGO-API` 는 python 3.10 이상의 버전을 지원합니다. (추후 3.10 이하 버전도 지원할 예정입니다.)
+`Unoffical-TAGO-API`는 Python 3.10 이상을 지원합니다.
 
 ## 버전 정책
 
@@ -42,20 +42,22 @@ pip install Unoffical-TAGO-API
 
 ## 주요 매개변수
 
-| 매개변수  | 설명 |
-|-----------|------|
-| `cityCode` | 도시 코드 |
-| `routeNo`  | 버스 노선 번호 |
-| `routeId`  | 버스 노선 ID |
-| `nodeId`   | 정류소 ID |
-| `nodeNm`   | 정류소 이름 |
-| `nodeNo`   | 정류소 번호 |
-| `gpsLati`  | 위도(WGS84) |
-| `gpsLong`  | 경도(WGS84) |
+라이브러리의 공개 API는 snake_case 매개변수를 사용합니다.
+
+| 매개변수 | 설명 |
+|---|---|
+| `city_code` | 도시 코드 |
+| `route_no` | 버스 노선 번호 |
+| `route_id` | 버스 노선 ID |
+| `station_id` | 정류소 ID |
+| `station_name` | 정류소 이름 |
+| `station_no` | 정류소 번호 |
+| `gps_latitude` | 위도(WGS84) |
+| `gps_longitude` | 경도(WGS84) |
 
 ---
 
-## 사용 법
+## 사용법
 
 ### 1. 클라이언트 생성
 
@@ -74,79 +76,126 @@ for city in cities:
     print(city.city_code, city.city_name)
 ```
 
----
+### 3. 노선과 정류소 조회
 
-### 3. 도메인 클래스
+```python
+routes = client.routes.list(city_code=22, route_no="북구1")
+
+for route in routes:
+    print(route.route_id, route.route_no)
+
+stations = client.routes.list_stations(
+    city_code=22,
+    route_id=routes.items[0].route_id,
+    num_of_rows=100,
+)
+
+print(stations.total_count)
+for station in stations:
+    print(station.station_id, station.station_name)
+```
+
+목록 Resource는 `TagoPage`를 반환합니다.
+
+```python
+page.items        # 현재 페이지의 모델 목록
+page.page_no      # 현재 페이지 번호
+page.num_of_rows  # 요청한 페이지 크기
+page.total_count  # 전체 결과 수
+```
+
+`TagoPage`는 반복과 `len()`을 지원하므로 모델 목록처럼 순회할 수 있습니다.
+
+### 4. 도메인 클래스
 
 클라이언트와 Resource는 다음과 같은 **도메인 객체**를 반환합니다.
 
-- `Station` : 정류소 정보  
-- `Vehicle` : 버스 차량 정보  
-- `Route` : 버스 노선 정보  
-- `ArrivalInfo` : 버스 도착 정보
+- `CityCode`: 서비스 가능 도시
+- `Station`: 정류소 정보
+- `Vehicle`: 버스 차량 정보
+- `Route`: 버스 노선 정보
+- `ArrivalInfo`: 버스 도착 정보
 
+## 도메인 객체 필드
 
----
+### `BaseModel`
 
-### 도메인 객체 필드 목록
+도메인 객체의 공통 상위 클래스이며 다음 메서드를 제공합니다.
 
-#### **BaseModel**
-도메인 객체들의 상위 객체 입니다.
+```python
+obj.to_dict()          # 객체 → dict 변환
+Station.from_dict(raw) # TAGO 응답 dict → Station 변환
+```
 
-다음과 같은 공통 메서드를 제공합니다.
-~~~python
-obj.to_dict()             # 객체 → dict 변환
-BaseModel.from_dict(dict) # dict → 객체 변환
-~~~
+### `CityCode`
 
-### **Station**
-| 필드명        | 타입                | 설명                     |
-|------------|-------------------|------------------------|
-| `nodeId`   | `str`             | 정류소 ID                 |
-| `nodeNm`   | `str`             | 정류소명                   |
-| `nodeNo`   | `int`             | 정류소 번호                 |
-| `gpsLati`  | `float`           | 위도 (WGS84)             |
-| `gpsLong`  | `float`           | 경도 (WGS84)             |
-| `cityCode` | `int`             | 도시코드                   |
-| `updowncd` | `int`             | 상하행구분코드 (`0`: 상행, `1`: 하행) |
-| `nodeord`  | `int`             | 정류소순번                  |
-| `routes`   | `list[Route]`     | 정류소를 경유하는 노선           |
+| 필드명 | 타입 | 설명 |
+|---|---|---|
+| `city_code` | `int` | 도시 코드 |
+| `city_name` | `str` | 도시 이름 |
 
+### `Station`
 
-### **Route**
-| 필드명                | 타입                  | 설명           |
-|--------------------|---------------------|--------------|
-| `routeId`          | `str`               | 노선 ID        |
-| `routeNo`          | `str`               | 노선명          |
-| `routeTp`          | `int`               | 노선유형         |
-| `endNodeNm`        | `str`               | 종점           |
-| `startNodeNm`      | `str`               | 기점           |
-| `endvehicletime`   | `int`               | 막차시간         |
-| `startvehicletime` | `int`               | 첫차시간         |
-| `stations`         | `list[Station]`     | 노선이 경유하는 정류소 |
+| 필드명 | 타입 | 설명 |
+|---|---|---|
+| `station_id` | `str` | 정류소 ID |
+| `station_name` | `str` | 정류소 이름 |
+| `station_no` | `str \| None` | 모바일 정류소 번호 |
+| `gps_latitude` | `float \| None` | 위도 |
+| `gps_longitude` | `float \| None` | 경도 |
+| `city_code` | `int \| None` | 도시 코드 |
+| `up_down_code` | `int \| None` | 상·하행 구분 코드 |
+| `node_order` | `int \| None` | 노선 내 정류소 순서 |
 
+### `Route`
 
-### **ArrivalInfo**
-| 필드명                 | 타입        | 설명     |
-|---------------------|-----------|--------|
-| `node`              | `Station` | 정류소 정보 |
-| `route`             | `Route`   | 노선 정보  |
-| `arrprevstationcnt` | `int`     | 노선유형   |
-| `vehicletp`         | `str`     | 차랑유형   |
-| `arrtime`           | `int`     | 도착예상시간 |
+| 필드명 | 타입 | 설명 |
+|---|---|---|
+| `route_id` | `str` | 노선 ID |
+| `city_code` | `int \| None` | 도시 코드 |
+| `route_no` | `str \| None` | 노선 번호 |
+| `route_type` | `str \| None` | 노선 유형 |
+| `start_node_name` | `str \| None` | 기점 |
+| `end_node_name` | `str \| None` | 종점 |
+| `start_vehicle_time` | `str \| None` | 첫차 시간 |
+| `end_vehicle_time` | `str \| None` | 막차 시간 |
+| `interval_time` | `int \| None` | 평일 배차 간격 |
+| `interval_sat_time` | `int \| None` | 토요일 배차 간격 |
+| `interval_sun_time` | `int \| None` | 일요일 배차 간격 |
 
-### **Vehicle**
-| 필드명 | 타입      | 설명         |
-|--------|---------|------------|
-| `route` | `Route` | 노선 정보      |
-| `gpsLati` | `float` | 위도 (WGS84) |
-| `gpsLong` | `float` | 경도 (WGS84) |
-| `arrtime` | `int`   | 도착예상시간     |
-| `arrprevstationcnt` | `int`   | 노선유형       |
-| `vehicleTp` | `str`   | 차랑유형       |
-| `vehicleNo` | `str`   | 차랑번호       |
+### `ArrivalInfo`
 
+| 필드명 | 타입 | 설명 |
+|---|---|---|
+| `station_id` | `str` | 정류소 ID |
+| `route_id` | `str` | 노선 ID |
+| `city_code` | `int \| None` | 도시 코드 |
+| `station_no` | `str \| None` | 정류소 번호 |
+| `station_name` | `str \| None` | 정류소 이름 |
+| `route_no` | `str \| None` | 노선 번호 |
+| `route_type` | `str \| None` | 노선 유형 |
+| `previous_station_count` | `int \| None` | 남은 정류소 수 |
+| `vehicle_type` | `str \| None` | 차량 유형 |
+| `arrival_time` | `int \| None` | 도착 예상 시간(초) |
 
+### `Vehicle`
+
+| 필드명 | 타입 | 설명 |
+|---|---|---|
+| `route_id` | `str` | 노선 ID |
+| `city_code` | `int \| None` | 도시 코드 |
+| `route_no` | `str \| None` | 노선 번호 |
+| `route_type` | `str \| None` | 노선 유형 |
+| `station_id` | `str \| None` | 현재 정류소 ID |
+| `station_name` | `str \| None` | 현재 정류소 이름 |
+| `station_no` | `str \| None` | 현재 정류소 번호 |
+| `node_order` | `int \| None` | 현재 정류소 순서 |
+| `gps_latitude` | `float \| None` | 위도 |
+| `gps_longitude` | `float \| None` | 경도 |
+| `arrival_time` | `int \| None` | 도착 예상 시간(초) |
+| `previous_station_count` | `int \| None` | 남은 정류소 수 |
+| `vehicle_type` | `str \| None` | 차량 유형 |
+| `vehicle_no` | `str \| None` | 차량 번호 |
 
 ## 지원 Resource API
 
@@ -166,6 +215,14 @@ BaseModel.from_dict(dict) # dict → 객체 변환
 
 기존 `client.get_route_by_no()` 등의 메서드는 호환성을 위해 유지되지만
 `DeprecationWarning`을 발생시키며 1.0.0에서 제거될 예정입니다.
+
+## Lazy field 상태
+
+`BaseModel.bind_client()`, `load()`, `refresh()`는 기존 실험적 lazy loading
+기능을 위해 유지됩니다. 현재 Resource가 반환하는 모델에는 클라이언트가
+자동으로 바인딩되지 않으므로, 일반 사용자는 관계 조회가 필요할 때
+`client.routes`, `client.stations` 등의 Resource 메서드를 직접 호출해야
+합니다. Lazy field는 현재 안정적인 공개 API 계약에 포함되지 않습니다.
 
 ## 예외 처리
 
