@@ -3,9 +3,7 @@ tagopi/__pycache__
 tests/__pycache__
 .pytest_cache
 .env
-caches/cache.pkl
 .vscodeoutput.json
 .tagoapi
-
-
-tagoapi/caches/station.pkl
+.idea/
+*.egg-info/

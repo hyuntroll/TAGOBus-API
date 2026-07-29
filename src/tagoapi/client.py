@@ -1,0 +1,234 @@
+from functools import wraps
+from types import TracebackType
+from typing import Any, Callable, ParamSpec, TypeVar
+import warnings
+
+from ._internal import HttpTransport
+from .models import ArrivalInfo, Route, Station, Vehicle
+from .resources import (
+    ArrivalResource,
+    CityResource,
+    RouteResource,
+    StationResource,
+    VehicleResource,
+)
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def _deprecated(
+    replacement: str,
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def decorator(method: Callable[P, R]) -> Callable[P, R]:
+        @wraps(method)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            warnings.warn(
+                f"{method.__qualname__}() is deprecated; "
+                f"use TAGOClient.{replacement}() instead. "
+                "It will be removed in version 1.0.0.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return method(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+class TAGOClient:
+    """TAGO 전송 계층과 서비스별 Resource를 조립하는 진입점."""
+
+    BASE_URL = "http://apis.data.go.kr/1613000"
+
+    def __init__(self, service_key: str) -> None:
+        if not service_key:
+            raise ValueError("service_key는 필수입니다.")
+
+        self._transport = HttpTransport(
+            base_url=self.BASE_URL,
+            service_key=service_key,
+        )
+        self.routes = RouteResource(self._transport)
+        self.stations = StationResource(self._transport)
+        self.arrivals = ArrivalResource(self._transport)
+        self.vehicles = VehicleResource(self._transport)
+        self.cities = CityResource(self._transport)
+
+    def __enter__(self) -> "TAGOClient":
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        self.close()
+
+    def close(self) -> None:
+        self._transport.close()
+
+    # 기존 공개 메서드는 1.0.0까지 새 Resource로 위임한다.
+    @_deprecated("routes.list")
+    def get_route_by_no(
+        self,
+        city_code: int | None = None,
+        route_no: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeNo: str | None = None,
+    ) -> list[Route]:
+        normalized_city_code = self._coalesce(city_code, cityCode)
+        normalized_route_no = self._coalesce(route_no, routeNo)
+        return self.routes.list(
+            normalized_city_code,
+            normalized_route_no,
+        ).items
+
+    @_deprecated("routes.get")
+    def get_route_by_id(
+        self,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
+    ) -> Route | None:
+        return self.routes.get(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+        )
+
+    @_deprecated("stations.list_routes")
+    def get_route_by_station(
+        self,
+        city_code: int | None = None,
+        station_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeId: str | None = None,
+    ) -> list[Route]:
+        return self.stations.list_routes(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(station_id, nodeId),
+        ).items
+
+    @_deprecated("routes.list_stations")
+    def get_station_by_route(
+        self,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
+    ) -> list[Station]:
+        return self.routes.list_stations(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+        ).items
+
+    @_deprecated("stations.list")
+    def get_station(
+        self,
+        city_code: int | None = None,
+        station_no: str | int | None = None,
+        station_name: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeNo: str | int | None = None,
+        nodeNm: str | None = None,
+    ) -> list[Station]:
+        return self.stations.list(
+            self._coalesce(city_code, cityCode),
+            station_no=self._coalesce(station_no, nodeNo),
+            station_name=self._coalesce(station_name, nodeNm),
+        ).items
+
+    @_deprecated("stations.list_nearby")
+    def get_station_by_gps(
+        self,
+        gps_lati: float | None = None,
+        gps_long: float | None = None,
+        *,
+        gpsLati: float | None = None,
+        gpsLong: float | None = None,
+    ) -> list[Station]:
+        return self.stations.list_nearby(
+            self._coalesce(gps_lati, gpsLati),
+            self._coalesce(gps_long, gpsLong),
+        ).items
+
+    @_deprecated("arrivals.list_by_station")
+    def get_arrival_by_station(
+        self,
+        city_code: int | None = None,
+        station_id: str | None = None,
+        node_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeId: str | None = None,
+    ) -> list[ArrivalInfo]:
+        return self.arrivals.list_by_station(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(station_id, node_id, nodeId),
+        ).items
+
+    @_deprecated("arrivals.list_by_station_and_route")
+    def get_route_arrival_by_station(
+        self,
+        city_code: int | None = None,
+        station_id: str | None = None,
+        node_id: str | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        nodeId: str | None = None,
+        routeId: str | None = None,
+    ) -> list[ArrivalInfo]:
+        return self.arrivals.list_by_station_and_route(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(station_id, node_id, nodeId),
+            self._coalesce(route_id, routeId),
+        ).items
+
+    @_deprecated("vehicles.list_by_route")
+    def get_route_pos(
+        self,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
+    ) -> list[Vehicle]:
+        return self.vehicles.list_by_route(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+        ).items
+
+    @_deprecated("vehicles.list_approaching_station")
+    def get_route_pos_near_station(
+        self,
+        city_code: int | None = None,
+        route_id: str | None = None,
+        station_id: str | None = None,
+        node_id: str | None = None,
+        *,
+        cityCode: int | None = None,
+        routeId: str | None = None,
+        nodeId: str | None = None,
+    ) -> list[Vehicle]:
+        return self.vehicles.list_approaching_station(
+            self._coalesce(city_code, cityCode),
+            self._coalesce(route_id, routeId),
+            self._coalesce(station_id, node_id, nodeId),
+        ).items
+
+    @staticmethod
+    def _coalesce(*values: Any) -> Any:
+        for value in values:
+            if value is not None:
+                return value
+        return None
