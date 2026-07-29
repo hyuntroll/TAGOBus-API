@@ -37,6 +37,7 @@ dev = [
     "flake8",
     "mypy",
     "pytest",
+    "types-xmltodict",
     "twine",
 ]
 
@@ -51,3 +52,10 @@ tagoapi = [
     "py.typed",
     "data/*.csv.gz",
 ]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/tagoapi"]
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true

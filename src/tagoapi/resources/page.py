@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from collections.abc import Iterator
 from typing import Generic, TypeVar
 
 
@@ -14,7 +15,7 @@ class TagoPage(Generic[T]):
     num_of_rows: int
     total_count: int
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[T]:
         return iter(self.items)
 
     def __len__(self) -> int:

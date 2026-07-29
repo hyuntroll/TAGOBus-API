@@ -1,3 +1,5 @@
+from typing import Any
+
 import httpx
 import xmltodict
 
@@ -34,10 +36,10 @@ class HttpTransport:
     }
 
     def __init__(
-            self,
-            *,
-            base_url: str,
-            service_key: str
+        self,
+        *,
+        base_url: str,
+        service_key: str,
     ) -> None:
         self._service_key = service_key
         self._client = httpx.Client(
@@ -48,15 +50,19 @@ class HttpTransport:
         self._client.close()
 
     def request(
-            self,
-            path: str,
-            * ,
-            params: dict
-    ) -> dict:
+        self,
+        path: str,
+        *,
+        params: dict[str, Any],
+    ) -> dict[str, Any]:
         request_params = dict(params or {})
         request_params.setdefault("serviceKey", self._service_key)
         try:
-            response = self._client.get(path, params=request_params, timeout=(3.0, 10.0))
+            response = self._client.get(
+                path,
+                params=request_params,
+                timeout=httpx.Timeout(10.0, connect=3.0),
+            )
         except httpx.TimeoutException as exc:
             raise TagoRequestTimeoutError(
                 "API 요청 시간이 초과되었습니다."
@@ -75,12 +81,18 @@ class HttpTransport:
         if status >= 400:
             raise TagoHTTPStatusError(status)
 
-    def _parse_response(self, response: httpx.Response) -> dict:
+    def _parse_response(
+        self,
+        response: httpx.Response,
+    ) -> dict[str, Any]:
         payload = self._parse_payload(response)
         self._raise_for_return_reason(payload)
         return payload
 
-    def _parse_payload(self, response: httpx.Response) -> dict:
+    def _parse_payload(
+        self,
+        response: httpx.Response,
+    ) -> dict[str, Any]:
         try:
             payload = response.json()
             if not isinstance(payload, dict):
@@ -98,7 +110,10 @@ class HttpTransport:
                     "TAGO 응답을 JSON 또는 XML로 디코딩할 수 없습니다."
                 ) from parse_exc
 
-    def _raise_for_return_reason(self, payload: dict) -> None:
+    def _raise_for_return_reason(
+        self,
+        payload: dict[str, Any],
+    ) -> None:
         error_code = payload.get("returnReasonCode")
         if not error_code:
             header = payload.get("header") or payload.get("cmmMsgHeader")
