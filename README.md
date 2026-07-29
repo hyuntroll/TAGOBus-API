@@ -243,6 +243,26 @@ except TagoAPIError as error:
     print(error)
 ```
 
+## 개발 및 테스트
+
+일반 테스트는 외부 네트워크를 사용하지 않습니다.
+
+```bash
+python -m pytest
+```
+
+실제 공공데이터 API 스모크 테스트는 명시적으로 활성화해야 합니다.
+기본 검증 대상은 도시 코드 `25`, 노선 번호 `100`이며 환경변수로 변경할 수
+있습니다.
+
+```bash
+TAGO_RUN_INTEGRATION=1 \
+TAGO_API_KEY="YOUR_SERVICE_KEY" \
+TAGO_TEST_CITY_CODE=25 \
+TAGO_TEST_ROUTE_NO=100 \
+python -m pytest -m integration tests/integration
+```
+
 ---
 ### 오류 및 이슈
 버그 제보 또는 기능 요청은 [GitHub 이슈](https://github.com/hyuntroll/TAGOBus-API/issues)에 등록해주세요.
