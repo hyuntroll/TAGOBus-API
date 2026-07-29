@@ -2,7 +2,7 @@
 
 이 프로젝트는 `MAJOR.MINOR.PATCH` 버전 형식을 사용합니다.
 
-## 0.13.0 - Unreleased
+## 0.13.0 - 2026-07-29
 
 ### Added
 
