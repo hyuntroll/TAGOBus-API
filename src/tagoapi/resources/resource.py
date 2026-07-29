@@ -25,16 +25,6 @@ class TagoResource:
     def __init__(self, transport: Transport) -> None:
         self._transport = transport
 
-    def _request(
-        self,
-        path: str,
-        params: dict[str, Any],
-    ) -> dict[str, Any] | list[dict[str, Any]]:
-        """하위 호환을 위한 원시 item 추출 메서드."""
-        _, body = self._request_body(path, params)
-        raw_items = self._extract_items(body)
-        return {} if raw_items is None else raw_items
-
     def _request_page(
         self,
         path: str,
